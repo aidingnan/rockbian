@@ -1,0 +1,8 @@
+The firmware may come from:
+
+1. cypress official release (fmac)
+2. rockchip rkwifibt repo
+3. raspberry pi distro
+4. armbian, ubuntu distro
+
+cypress firmware are suffixed with version. others are suffixed by source.

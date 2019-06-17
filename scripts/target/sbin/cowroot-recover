@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# this script recover system.env when u-boot rejects switching.
+#
+# aa|ab -> aa|aa
+#
+# exit 0 if
+# 1. operation is applicable and succeeded.
+# 2. operation is not applicable.
+# 
+# if the operation succeeds, the recovered envs are recorded in runtime.env
+# - recovered
+# - recovered_opts 
+
+set -e
+
+source cowroot-env
+source $SYSTEM_ENV
+source $RUNTIME_ENV
+
+if 
+  [ $loader_l == $loader_r ] &&
+  [ $loader_l == $system_l ] &&
+  [ $system_l != $system_r ]; then
+
+  recovered=$system_r
+  recovered_opts=$system_r_opts
+
+cat > $SYSTEM_TMP << EOF
+system_l=$system_l
+system_l_opts=$system_l_opts
+system_r=$system_l
+system_r_opts=$system_l_opts
+EOF
+
+  mv $SYSTEM_TMP $SYSTEM_ENV
+
+  echo "recovered=$recovered" >> $RUNTIME_ENV
+  echo "recovered_opts=$recovered_opts" >> $RUNTIME_ENV
+
+fi

@@ -1,0 +1,126 @@
+#!/bin/bash
+
+function printenv () {
+  echo ">>>> $1"
+  echo "---- system.env"
+  cat $SYSTEM_ENV
+  echo "---- runtime.env"
+  cat $RUNTIME_ENV
+  echo ""
+}
+
+echo ""
+echo "COWROOT Hijacker"
+echo ""
+
+source cowroot-env
+
+# without /tmp rw, heredoc does not work
+mount -t tmpfs tmpfs /tmp
+
+CMDLINE=$(cat /proc/cmdline)
+IFS=' ' read -ra cmd_array <<< "$CMDLINE"
+for i in "${cmd_array[@]}"; do
+  if [[ $i =~ root=UUID=${UUID_REGEX} ]]; then
+    root_vol=${i:10}
+  elif [[ $i == rootflags=* ]]; then
+    IFS=',' read -ra rootflag_array <<< "${i:10}"
+    for j in "${rootflag_array[@]}"; do
+      if [[ $j =~ ^subvol=/vols/${UUID_REGEX} ]]; then
+        ro_root_subvol=${j:13}
+      elif [[ $j =~ ^subvol=vols/${UUID_REGEX} ]]; then
+        ro_root_subvol=${j:12}
+      fi  
+    done
+  elif [[ $i == cowrootflags=* ]]; then
+    IFS=',' read -ra loaderflag_array <<< "${i:13}"
+    for k in "${loaderflag_array[@]}"; do
+      if [[ $k == op=* ]]; then
+        loader_op=${k:3}
+      elif [[ $k =~ ^l=${UUID_REGEX} ]]; then
+        loader_l=${k:2}    
+      elif [[ $k =~ ^r=${UUID_REGEX} ]]; then
+        loader_r=${k:2}
+      fi  
+    done
+  fi  
+done
+
+TMP_RW_ROOT=/tmp/rw-root
+mkdir -p $ROOT_MNT $TMP_RW_ROOT
+
+echo "mount root volume @ $ROOT_MNT"
+mount -t btrfs UUID=$root_vol $ROOT_MNT 2>&1 1>/dev/null
+
+if [ ! -f $ROOT_MNT/boot/.max ]; then
+  btrfs filesystem resize max $ROOT_MNT && touch $ROOT_MNT/boot/.max
+fi
+
+[ -f $ROOT_MNT/boot/.debug_init ] && DEBUG=true
+
+source $SYSTEM_ENV
+cat > $RUNTIME_ENV << EOF
+root_vol=$root_vol
+ro_root_subvol=$ro_root_subvol
+_system_l=$system_l
+_system_l_opts=$system_l_opts
+_system_r=$system_r
+_system_r_opts=$system_r_opts
+loader_l=$loader_l
+loader_r=$loader_r
+loader_op=$loader_op
+EOF
+
+[ $DEBUG ] && printenv "after generate runtime.env"
+
+cowroot-commit
+[ $DEBUG ] && printenv "after cowroot-commit"
+
+source $SYSTEM_ENV
+source $RUNTIME_ENV
+if [ $committed ]; then
+  echo "uncommitted rootfs found and committed, reboot to new snapshot ${committed} ..."
+  echo ""
+  sync
+  umount $ROOT_MNT
+  echo b > /proc/sysrq-trigger
+  exit 0
+fi
+
+cowroot-recover
+[ $DEBUG ] && printenv "after cowroot-recover"
+
+source $SYSTEM_ENV
+source $RUNTIME_ENV
+[ $recovered ] && echo "recovered from ${recovered} ${recovered_opts}"
+
+if [ -d $RW_SUBVOL ]; then
+  btrfs subvolume delete $RW_SUBVOL 2>&1 1>/dev/null
+fi
+
+echo "snapshot ro volume $ro_root_subvol to rw volume"
+btrfs subvolume snapshot / $RW_SUBVOL 2>&1 1>/dev/null
+mkdir -p $RW_SUBVOL/boot
+echo $ro_root_subvol > $RW_SUBVOL/boot/.parent
+
+mount -t btrfs -o subvol=vols/$rw_subvol UUID=$root_vol $TMP_RW_ROOT
+
+echo "pivot_root to rw volume"
+cd $TMP_RW_ROOT
+mkdir ro-root
+pivot_root . ro-root
+
+# exec chroot . sh </dev/console >/dev/console 2>&1
+exec chroot . sh -c "$(cat <<END
+mount --move /ro-root/run /run
+mount --move /ro-root/dev /dev
+mount --move /ro-root/sys /sys
+mount --move /ro-root/proc /proc
+umount /ro-root/tmp
+umount /ro-root
+rm -rf /ro-root
+
+echo "start systemd..."
+exec /lib/systemd/systemd
+END
+)"

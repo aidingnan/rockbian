@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source cowroot-env
+echo ":: system.env"
+cat $SYSTEM_ENV
+echo ":: runtime.env"
+cat $RUNTIME_ENV
+

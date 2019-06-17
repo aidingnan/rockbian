@@ -1,0 +1,15 @@
+#!/bin/bash
+
+root_vol=e383f6f7-6572-46a9-a7fa-2e0633015231     # root vol
+rw_subvol=ebcc3123-127a-4d26-b083-38e8c0bf7f09    # rw / working subvol
+tmp_subvol=07371046-38a3-43d5-9ded-d92584d7e751   # tmp / staging subvol
+
+UUID_REGEX="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"
+
+ROOT_MNT=/run/cowroot/root                        # btrfs root volume mount point
+RW_SUBVOL=$ROOT_MNT/vols/$rw_subvol
+TMP_SUBVOL=$ROOT_MNT/vols/$tmp_subvol
+
+SYSTEM_ENV=$ROOT_MNT/boot/system.env              # system env file
+SYSTEM_TMP=$ROOT_MNT/boot/system.env.tmp          # temp system env file
+RUNTIME_ENV=/run/cowroot/runtime.env              # boot env file

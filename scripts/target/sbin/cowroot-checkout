@@ -1,0 +1,79 @@
+#!/bin/bash
+
+#
+#
+#
+# echo something 1>&2
+#
+
+set -e
+
+source cowroot-env
+source $SYSTEM_ENV
+source $RUNTIME_ENV
+
+if  # ab|ab
+  [ "$loader_l" == "$system_l" ] &&
+  [ "$loader_r" == "$system_r" ] &&
+  [ "$loader_l" != "$loader_r" ]; then
+  echo "forbidden" 1>&2
+  exit 1
+fi
+
+# not _a|a_ (aka, neither _a|aa nor _a|ab)
+if [ "$loader_r" != "$system_l" ]; then
+  echo "internal error" 1>&2
+  exit 1
+fi
+
+while getopts ":m:" o; do
+  case "${o}" in
+    m)
+      opts=${OPTARG}
+      ;;
+    *)
+      echo "invalid args" 1>&2
+      echo "usage: cowroot-checkout [-m [ro || rw]] [uuid]"
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ -z $opts ]; then
+  echo "invalid args" 1>&2
+  echo "mode not set"
+  exit 1
+elif [ $opts != ro ] && [ $opts != rw ]; then
+  echo "invalid args" 1>&2
+  echo "mode can only be ro or rw"
+  exit 1
+fi
+
+if [ "$1" ]; then
+  if [[ "$1" =~ ^${UUID_REGEX} ]]; then
+    if [ -d "$ROOT_MNT/vols/$1" ]; then
+      uuid=$1    
+    else 
+      echo "entry not found" 1>&2
+      echo "$1 not found"
+      exit 1
+    fi
+  else
+    echo "invalid args" 1>&2
+    echo "not a uuid: $1"
+    exit 1
+  fi
+else 
+  uuid=$system_r
+fi
+
+cat > $SYSTEM_TMP << EOF
+system_l=$system_l
+system_l_opts=$system_l_opts
+system_r=$uuid
+system_r_opts=$opts
+EOF
+
+mv $SYSTEM_TMP $SYSTEM_ENV
+

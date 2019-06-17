@@ -1,0 +1,61 @@
+#!/bin/bash
+
+source cowroot-env
+source $SYSTEM_ENV
+source $RUNTIME_ENV
+
+# u-boot always boot rvalue
+# auto-commit is not seen in system after hijacker
+# in all scenarios except for unconfirmed stepping, system_r_opts rules.
+function curr_status {
+  echo "current rootfs based on ${loader_r}, working in ${system_r_opts} mode"
+}
+
+# in all valid cases, system_l and system_l_opts is the default next boot.
+# if system_r(_opts) is different, indicating a new switch request
+function next_status {
+  if [ ${system_r} != ${system_l} ]; then
+    echo "next boot will switch to ${system_r} in ${system_r_opts} mode." 
+  elif [ ${system_r_opts} != ${system_l_opts} ]; then
+    if [ ${system_r_opts} == rw ]; then
+      echo "switched to rw mode, next boot will preserved rootfs changes in current session."
+    else 
+      echo "switched to ro mode, next boot will discard rootfs changes in current session."
+    fi
+  else 
+    if [ ${system_r_opts} == rw ]; then
+      echo "next boot will snapshot current rootfs and use it as rootfs base, preserving changes in current session."
+    else 
+      echo "next boot will use the same rootfs base, discarding rootfs changes in current session."
+    fi
+  fi
+}
+
+# aa|aa
+if [ $loader_l == $loader_r ] && [ $loader_r == $_system_l ] && [ $_system_l == $_system_r ]; then
+  echo "system boots in normal mode (aa|aa)." 
+  curr_status
+  next_status
+# aa|ab -> aa|aa
+elif [ $loader_l == $loader_r ] && [ $loader_r == $_system_l ] && [ $_system_l != $_system_r ]; then
+  echo "system boots in recover mode (aa|ab)."
+  echo "u-boot failed to boot ${_system_r} (${_system_r_opts}) and switched back to ${loader_r}."
+  curr_status
+  next_status
+# ab|ab -> ab|bb
+elif [ $loader_l != $loader_r ] && [ $loader_l == $_system_l ] && [ $loader_r == $_system_r ]; then
+  echo "system boots in step mode (ab|ab)."
+  echo "u-boot trys to switch from ${_system_l} (${_system_l_opts}) to current one."
+  curr_status
+  if [ $system_l == $_system_l ]; then
+    echo "system has not confirmed current rootfs base is usable."
+    echo "If not confirmed before next boot, u-boot will recover to old rootfs base."
+  else  
+    echo "system has confirmed current rootfs base is usable."
+    next_status
+  fi
+else
+  echo "invalid initial boot states. Check system.env and runtime.env."
+fi
+
+
