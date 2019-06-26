@@ -10,9 +10,9 @@ $SCRIPT_DIR/fetch-node.sh
 
 source $SCRIPT_DIR/main.env
 
-if [ -f $SCRIPT_DIR/$WINAS_ENV ]; then
-  source $SCRIPT_DIR/$WINAS_ENV
-
+if [ -f $WINAS_ENV ]; then
+  source $WINAS_ENV
+  echo "checking latest winas version..."
   SHA=$(curl -s https://api.github.com/repos/aidingnan/winas/commits/master | jq '.sha')
   if [[ ! "$SHA" =~ ^\"[a-f0-9]{40}\"$ ]]; then
     echo "winas, bad sha: $SHA"
@@ -20,16 +20,20 @@ if [ -f $SCRIPT_DIR/$WINAS_ENV ]; then
   fi
 
   SHA=${SHA:1:40}
-  if [ "$WINAS_REV" == "$SHA" ] && [ -f "$WINAS_TAR" ]; then :; else
+  if [ "$WINAS_SHA" == "$SHA" ] && [ -f $CACHE/$WINAS_TAR ]; then
+    echo "$WINAS_TAR is up-to-date"
+  else
+    echo "new version found, prepare to build winas"
     BUILD_WINAS=true 
   fi
 else
+  echo "$WINAS_ENV not found, prepare to build winas"
   BUILD_WINAS=true
 fi
 
-if [ -f $SCRIPT_DIR/$WINASD_ENV ]; then
-  source $SCRIPT_DIR/$WINASD_ENV
-
+if [ -f $WINASD_ENV ]; then
+  source $WINASD_ENV
+  echo "checking latest winasd version..."
   SHA=$(curl -s https://api.github.com/repos/aidingnan/winasd/commits/master | jq '.sha')
   if [[ ! "$SHA" =~ ^\"[a-f0-9]{40}\"$ ]]; then
     echo "winasd, bad sha: $SHA"
@@ -37,10 +41,14 @@ if [ -f $SCRIPT_DIR/$WINASD_ENV ]; then
   fi
 
   SHA=${SHA:1:40}
-  if [ "$WINASD_SHA" == "$SHA" ] && [ -f "$WINASD_TAR" ]; then :; else
+  if [ "$WINASD_SHA" == "$SHA" ] && [ -f $CACHE/$WINASD_TAR ]; then
+    echo "$WINASD_TAR is up-to-date"
+  else
+    echo "new version found, prepare to build winasd"
     BUILD_WINASD=true 
   fi
 else
+  echo "$WINASD_ENV not found, prepare to build winasd"
   BUILD_WINASD=true
 fi
 
@@ -61,7 +69,7 @@ if [ $BUILD_WINAS ]; then
   echo $WINAS_SHA > $ROOT/winas/.sha
   rm -rf $ROOT/winas/.git
   chroot $ROOT bash -c "cd /winas; PYTHON=/usr/bin/python2.7 npm i"
-  tar czf $CACHE/$WINAS_TAR .
+  tar czf $CACHE/$WINAS_TAR -C $ROOT/winas .
 
 cat > $WINAS_ENV << EOF
 WINAS_SHA=$WINAS_SHA
@@ -74,10 +82,10 @@ if [ $BUILD_WINASD ]; then
   git clone https://github.com/aidingnan/winasd $ROOT/winasd
   WINASD_SHA=$(GIT_DIR=$ROOT/winasd/.git git rev-parse HEAD)
   WINASD_TAR=winasd-master-${WINASD_SHA:0:7}.tar.gz
-  echo $WINASD_SHA > .sha
+  echo $WINASD_SHA > $ROOT/winasd/.sha
   rm -rf $ROOT/winasd/.git
   chroot $ROOT bash -c "cd winasd; PYTHON=/usr/bin/python2.7 npm i"
-  tar czf $CACHE/$WINASD_TAR .
+  tar czf $CACHE/$WINASD_TAR -C $ROOT/winasd .
 
 cat > $WINASD_ENV << EOF
 WINASD_SHA=$WINASD_SHA
