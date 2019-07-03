@@ -1,21 +1,19 @@
-# 
 env_mem_addr_r=0x08000000
 env_mem_size=0x1000
 cow_loader_mmc_block=0xF100
 loader_env_dirty="false"
 loader_op="none"
 
-#
 setenv update_loader_env 'setenv loader_l ${system_l}; setenv loader_r ${system_r}; loader_env_dirty=true'
 setenv rollback_loader_env 'setenv loader_r ${loader_l}; loader_env_dirty=true'
 setenv zero_env_mem 'mw.b ${env_mem_addr_r} 0 ${env_mem_size}'
-setenv die 'echo "sleep 30 seconds before resetting"; sleep 30; reset'
+setenv die 'echo sleep 30 seconds before resetting; sleep 30; reset'
 
 echo "start cowroot booting..."
 
 run zero_env_mem
 load ${devtype} ${devnum}:${partnum} ${env_mem_addr_r} /boot/system.env
-env import -d -t ${env_mem_addr_r} - system_l system_r
+env import -t ${env_mem_addr_r} - system_l system_r
 
 if env exists system_l; then; else echo "system_l does not exist"; run die; fi
 if env exists system_r; then; else echo "system_r does not exist"; run die; fi
@@ -24,14 +22,14 @@ echo "system env loaded, l: ${system_l}, r: ${system_r}"
 
 run zero_env_mem
 mmc read ${env_mem_addr_r} ${cow_loader_mmc_block} 1
-env import -d -t ${env_mem_addr_r} - loader_l loader_r
+env import -t ${env_mem_addr_r} - loader_l loader_r
 
 if env exists loader_l; then; else setenv loader_l null; fi
 if env exists loader_r; then; else setenv loader_r null; fi
 
 echo "loader env loaded, l: ${loader_l}, r: ${loader_r}"
 
-if test ${system_l} = ${system_r}; then
+if test "${system_l}" = "${system_r}"; then
   if test "${loader_l}" = "null" && test "${loader_l}" = "null"; then
     # __|aa -> aa|aa
     echo "initialize loader env"
