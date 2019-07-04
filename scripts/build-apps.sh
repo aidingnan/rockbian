@@ -3,6 +3,8 @@
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
+SCRIPT_NAME=$(basename "$0")
+PREFIX="[${SCRIPT_NAME}]"
 
 # dependencies
 $SCRIPT_DIR/debase-build.sh
@@ -12,7 +14,7 @@ source $SCRIPT_DIR/main.env
 
 if [ -f $WINAS_ENV ]; then
   source $WINAS_ENV
-  echo "checking latest winas version..."
+  echo $PREFIX "checking latest winas version..."
   SHA=$(curl -s https://api.github.com/repos/aidingnan/winas/commits/master | jq '.sha')
   if [[ ! "$SHA" =~ ^\"[a-f0-9]{40}\"$ ]]; then
     echo "winas, bad sha: $SHA"
@@ -21,22 +23,22 @@ if [ -f $WINAS_ENV ]; then
 
   SHA=${SHA:1:40}
   if [ "$WINAS_SHA" == "$SHA" ] && [ -f $CACHE/$WINAS_TAR ]; then
-    echo "$WINAS_TAR is up-to-date"
+    echo $PREFIX "$WINAS_TAR is up-to-date"
   else
-    echo "new version found, prepare to build winas"
+    echo $PREFIX "new version found, prepare to build winas"
     BUILD_WINAS=true 
   fi
 else
-  echo "$WINAS_ENV not found, prepare to build winas"
+  echo $PREFIX "$WINAS_ENV not found, prepare to build winas"
   BUILD_WINAS=true
 fi
 
 if [ -f $WINASD_ENV ]; then
   source $WINASD_ENV
-  echo "checking latest winasd version..."
+  echo $PREFIX "checking latest winasd version..."
   SHA=$(curl -s https://api.github.com/repos/aidingnan/winasd/commits/master | jq '.sha')
   if [[ ! "$SHA" =~ ^\"[a-f0-9]{40}\"$ ]]; then
-    echo "winasd, bad sha: $SHA"
+    echo $PREFIX "winasd, bad sha: $SHA"
     exit 1
   fi
 
@@ -53,11 +55,11 @@ else
 fi
 
 if [ $BULD_WINAS ] || [ $BUILD_WINASD ]; then
-  ROOT=$PWD/tmp/node-root
+  ROOT=$TMP/build-apps-root
   rm -rf $ROOT
   mkdir -p $ROOT
 
-  tar xf $CACHE/$DEBASE_BUILD -C $ROOT
+  tar xf $CACHE/$DEBASE_BUILD_TAR -C $ROOT
   tar xf $CACHE/$NODE_TAR -C $ROOT/usr --strip-components=1
   chroot $ROOT npm config set unsafe-perm true
 fi
