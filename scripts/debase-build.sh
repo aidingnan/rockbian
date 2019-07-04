@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$0")
 
 source $SCRIPT_DIR/main.env
 
-if [ -f $CACHE/$DEBASE_BUILD ]; then exit; fi
+if [ -f $CACHE/$DEBASE_BUILD_TAR ]; then exit; fi
 
 DEBASE=$TMP/debase-build
 

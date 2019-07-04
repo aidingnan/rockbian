@@ -2,17 +2,19 @@
 
 set -e
 
-if [ -z "$1" ]; then
-  echo "usage: mkcow.sh /path/to/kernel/deb/file [subvolume uuid]"
-  exit 1
-fi
+SCRIPT_DIR=$(dirname "$0")
 
-if [ ! -f "$1" ]; then
-  echo "not a file: $1"
-  exit 1
-fi
+# dependencies
+# $SCRIPT_DIR/debase-build.sh
+# $SCRIPT_DIR/fetch-node.sh
 
-KDEB_FILE=$1
+source $SCRIPT_DIR/main.env
+
+if [ $1 ]; then
+  KDEB_FILE=$1
+else 
+  KDEB_FILE=$CACHE/$KERNEL_DEB
+fi
 
 # the predefined uuids
 root_vol=e383f6f7-6572-46a9-a7fa-2e0633015231     # root vol 
@@ -79,6 +81,9 @@ cp scripts/target/sbin/* $TMPVOL/sbin
 # deploy firmware
 mkdir -p $TMPVOL/lib/firmware
 cp -r firmware/* $TMPVOL/lib/firmware
+
+# permit root login
+sed -i '/PermitRootLogin/c\PermitRootLogin yes' $TMPVOL/etc/ssh/sshd_config
 
 # add ttyGS0 to secure tty
 cat >> $TMPVOL/etc/securetty << EOF
@@ -154,6 +159,9 @@ chroot $TMPVOL ln -s /lib/systemd/system/getty@.service /etc/systemd/system/gett
 # enable systemd-resolvd
 chroot $TMPVOL systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf $TMPVOL/etc/resolv.conf
+
+# install node
+tar xf cache/node-v10.16.0-linux-arm64.tar.xz -C $TMPVOL/usr --strip-components=1
 
 echo "installing kernel"
 scripts/install-kernel.sh $TMPVOL $KDEB_FILE 

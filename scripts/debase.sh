@@ -1,13 +1,23 @@
 #!/bin/bash
 
-# debootstrap, binfmt-support, qemu-user-static
+#
+# required packages: debootstrap, binfmt-support, qemu-user-static
+#
 
-CACHE=cache
-DEBASE=tmp/debase
+set -e
+
+SCRIPT_DIR=$(dirname "$0")
+
+source $SCRIPT_DIR/main.env
+
+if [ -f $CACHE/$DEBASE_TAR ]; then
+  echo "$CACHE/$DEBASE_TAR exists, skip rebuilding."
+fi
 
 # tzdata already in base
-INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,
-INCS+=python-minimal,build-essential,vim,git,wget,file,unzip,stress-ng,
+INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,
+INCS+=curl,wget,file,unzip,
+# INCS+=python-minimal,build-essential,vim,git,wget,file,unzip,stress-ng,
 INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,
 INCS+=bluez,bluez-tools,bluetooth,
 INCS+=openssh-server,network-manager,
@@ -15,11 +25,12 @@ INCS+=openssh-server,network-manager,
 # INCS+=samba,rsyslog
 INCS+=libimage-exiftool-perl,imagemagick,ffmpeg
 
-rm -rf $DEBASE
-mkdir -p $DEBASE
-debootstrap --arch=arm64 --foreign --include=$INCS buster $DEBASE
-cp -av /usr/bin/qemu-aarch64-static $DEBASE/usr/bin
-chroot $DEBASE /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+WORKDIR=$TMP/debase
 
-mkdir -p cache
-tar czf $CACHE/debase.tar.gz -C $DEBASE .
+rm -rf $WORKDIR
+mkdir -p $WORKDIR
+debootstrap --arch=arm64 --foreign --include=$INCS buster $WORKDIR
+cp -av /usr/bin/qemu-aarch64-static $WORKDIR/usr/bin
+chroot $WORKDIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+
+tar czf $CACHE/$DEBASE_TAR -C $WORKDIR .
