@@ -5,7 +5,7 @@
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
-SCROPT_NAME=$(basename "$0")
+SCRIPT_NAME=$(basename "$0")
 ECHO="echo ${SCRIPT_NAME}: "
 
 source $SCRIPT_DIR/main.env
@@ -15,8 +15,9 @@ if [ -f $CACHE/$DEBASE_BUILD_TAR ]; then
   exit 0
 fi
 
-WORKDIR=$TMP/debase-build
+$ECHO "building $DEBASE_BUILD_TAR ..."
 
+WORKDIR=$TMP/debase-build
 rm -rf $WORKDIR
 mkdir -p $WORKDIR
 debootstrap --arch=arm64 --foreign --include=python2.7 --variant=buildd buster $WORKDIR
