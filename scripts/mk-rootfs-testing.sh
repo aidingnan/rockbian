@@ -3,15 +3,21 @@
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
+SCRIPT_NAME=$(basename "$0")
+ECHO="echo $SCRIPT_NAME:"
 
 # dependencies
 $SCRIPT_DIR/build-kernel.sh
 $SCRIPT_DIR/debase-testing.sh
 
+
+
 source $SCRIPT_DIR/main.env
 
+
+
 if [ -f $CACHE/$ROOTFS_TESTING_TAR ]; then
-  echo "$CACHE/$ROOTFS_TESTING_TAR exists, skip rebuilding."
+  $ECHO "$CACHE/$ROOTFS_TESTING_TAR exists, skip building"
   exit 0
 fi
 
@@ -22,6 +28,11 @@ mkdir -p $ROOT
 
 tar xzf $CACHE/$DEBASE_TESTING_TAR -C $ROOT
 
+# !!! important, use qemu bin on host machine (Ubuntu 19.04 or Debian 10 or above)
+cp -av /usr/bin/qemu-aarch64-static $ROOT/usr/bin
+
+# TODO
+rm $ROOT/sbin/init
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
@@ -107,13 +118,10 @@ chroot $ROOT ln -s /lib/systemd/system/getty@.service /etc/systemd/system/getty.
 chroot $ROOT systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
 
-echo "installing kernel"
-scripts/install-kernel.sh $ROOT $KDEB_FILE 
+$ECHO "installing kernel"
+scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
 tar czf $TMP/$ROOTFS_TESTING_TAR -C $ROOT .
 mv $TMP/$ROOTFS_TESTING_TAR $CACHE/$ROOTFS_TESTING_TAR
 
-echo "Done"
-
-
-
+$ECHO "$ROOTFS_TESTING_TAR is ready"

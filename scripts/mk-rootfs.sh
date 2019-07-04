@@ -3,11 +3,13 @@
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
+SCRIPT_NAME=$(basename "$0")
+ECHO="echo $SCRIPT_NAME:"
 
 # dependencies
+$SCRIPT_DIR/build-kernel.sh
 $SCRIPT_DIR/debase.sh
 $SCRIPT_DIR/fetch-node.sh
-$SCRIPT_DIR/build-kernel.sh
 $SCRIPT_DIR/build-apps.sh
 
 source $SCRIPT_DIR/main.env
@@ -15,7 +17,7 @@ source $CACHE/winas.env
 source $CACHE/winasd.env
 
 if [ -f $CACHE/$ROOTFS_TAR ]; then
-  echo "$CACHE/$ROOTFS_TAR exists, skip rebuilding."
+  $ECHO "$CACHE/$ROOTFS_TAR exists, skip rebuilding"
   exit 0
 fi
 
@@ -26,13 +28,20 @@ mkdir -p $ROOT
 
 tar xzf $CACHE/$DEBASE_TAR -C $ROOT
 
+# !!! important, use qemu bin on host machine (Ubuntu 19.04 or Debian 10 or above)
+cp -av /usr/bin/qemu-aarch64-static $ROOT/usr/bin
+
+# TODO
+rm $ROOT/sbin/init
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
 cp -r firmware/* $ROOT/lib/firmware
 
-# permit root login
-sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
+# permit root login if ssh server installed
+if [ -f $ROOT/etc/ssh/sshd_config ]; then
+  sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
+fi
 
 # add ttyGS0 to secure tty
 cat >> $ROOT/etc/securetty << EOF
@@ -112,13 +121,10 @@ ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
 # install node
 tar xf cache/node-v10.16.0-linux-arm64.tar.xz -C $ROOT/usr --strip-components=1
 
-echo "installing kernel"
-scripts/install-kernel.sh $ROOT $KDEB_FILE 
+$ECHO "installing kernel"
+scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
 tar czf $TMP/$ROOTFS_TAR -C $ROOT .
 mv $TMP/$ROOTFS_TAR $CACHE/$ROOTFS_TAR
 
-echo "Done"
-
-
-
+$ECHO "$ROOTFS_TAR is ready"

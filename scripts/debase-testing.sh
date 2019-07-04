@@ -25,11 +25,11 @@ INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,
 INCS+=curl,wget,file,unzip,vim,wget,file,unzip,stress-ng,
 INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,
 INCS+=bluez,bluez-tools,bluetooth,
-INCS+=openssh-server,network-manager,
+INCS+=openssh-server,network-manager
 
 rm -rf $DIR
 mkdir -p $DIR
-debootstrap --arch=arm64 --foreign --variant=minbase buster $DIR
+debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS  buster $DIR
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
 chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
 tar czf $CACHE/$DEBASE_TESTING_TAR -C $DIR .
