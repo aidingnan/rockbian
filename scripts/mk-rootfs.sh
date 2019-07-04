@@ -24,7 +24,7 @@ ROOT=$TMP/rootfs
 rm -rf $ROOT
 mkdir -p $ROOT 
 
-tar xzf $CACHE/$DEBASE_TAR
+tar xzf $CACHE/$DEBASE_TAR -C $ROOT
 
 cp scripts/target/sbin/* $ROOT/sbin
 

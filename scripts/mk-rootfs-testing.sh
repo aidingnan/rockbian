@@ -9,8 +9,6 @@ $SCRIPT_DIR/build-kernel.sh
 $SCRIPT_DIR/debase-testing.sh
 
 source $SCRIPT_DIR/main.env
-source $CACHE/winas.env
-source $CACHE/winasd.env
 
 if [ -f $CACHE/$ROOTFS_TESTING_TAR ]; then
   echo "$CACHE/$ROOTFS_TESTING_TAR exists, skip rebuilding."
@@ -22,15 +20,17 @@ ROOT=$TMP/rootfs-testing
 rm -rf $ROOT
 mkdir -p $ROOT 
 
-tar xzf $CACHE/$DEBASE_TESTING_TAR
+tar xzf $CACHE/$DEBASE_TESTING_TAR -C $ROOT
 
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
 cp -r firmware/* $ROOT/lib/firmware
 
-# permit root login
-sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
+# permit root login if ssh server installed
+if [ -f $ROOT/etc/ssh/sshd_config ]; then
+  sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
+fi
 
 # add ttyGS0 to secure tty
 cat >> $ROOT/etc/securetty << EOF
