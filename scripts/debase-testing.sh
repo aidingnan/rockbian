@@ -1,20 +1,31 @@
 #!/bin/bash
 
-# debootstrap, binfmt-support, qemu-user-static
+#
+# required packages: debootstrap, binfmt-support, qemu-user-static
+#
 
 set -e
 
 SCRIPT_DIR=$(dirname "$0")
+SCRIPT_NAME=$(dirname "$0")
+ECHO="echo ${SCRIPT_NAME}: "
 
 source $SCRIPT_DIR/main.env
 
-if [ -f $CACHE/$DEBASE_TESTING ]; then exit; fi
+if [ -f $CACHE/$DEBASE_TESTING_TAR ]; then
+  $ECHO "$CACHE/$DEBASE_TESTING_TAR exists, skip building"
+  exit 0
+fi
 
-DEBASE=$TMP/debase-testing
+$ECHO "building $DEBASE_TESTING_TAR ..."
 
-rm -rf $DEBASE
-mkdir -p $DEBASE
-debootstrap --arch=arm64 --foreign --variant=minbase buster $DEBASE
-cp -av /usr/bin/qemu-aarch64-static $DEBASE/usr/bin
-chroot $DEBASE /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-tar czf $CACHE/$DEBASE_BUILD -C $DEBASE .
+DIR=$TMP/debase-testing
+
+rm -rf $DIR
+mkdir -p $DIR
+debootstrap --arch=arm64 --foreign --variant=minbase buster $DIR
+cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
+chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+tar czf $CACHE/$DEBASE_TESTING_TAR -C $DIR .
+
+$ECHO "$DEBASE_TESTING_TAR is ready"

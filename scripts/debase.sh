@@ -13,9 +13,11 @@ ECHO="echo ${SCRIPT_NAME}: "
 source $SCRIPT_DIR/main.env
 
 if [ -f $CACHE/$DEBASE_TAR ]; then
-  $ECHO "$CACHE/$DEBASE_TAR exists, skip building."
+  $ECHO "$CACHE/$DEBASE_TAR exists, skip building"
   exit 0
 fi
+
+$ECHO "building $DEBASE_TAR ..."
 
 # tzdata already in base
 INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,
@@ -37,4 +39,5 @@ cp -av /usr/bin/qemu-aarch64-static $WORKDIR/usr/bin
 chroot $WORKDIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
 
 tar czf $CACHE/$DEBASE_TAR -C $WORKDIR .
-$ECHO "$CACHE/$DEBASE_TAR is ready."
+
+$ECHO "$DEBASE_TAR is ready"
