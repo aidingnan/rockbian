@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMG=bin/part8g_cow_dos.img
+IMG=rkbin/part8g_cow_dos.img
 
 mkdir -p bin 
 

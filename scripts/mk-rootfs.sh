@@ -50,12 +50,6 @@ cat >> $ROOT/etc/securetty << EOF
 ttyGS0
 EOF
 
-# set up fstab
-# cat > $ROOT/etc/fstab << EOF
-# <file system>                             <mount point>     <type>  <options>                   <dump>  <fsck>
-# UUID=0cbc36fa-3b85-40af-946e-f15dce29d86b   /mnt/persistent   ext4    defaults                    0       1
-# EOF
-
 # set up hosts
 cat > $ROOT/etc/hosts << EOF
 127.0.0.1 localhost
@@ -95,7 +89,7 @@ chroot $ROOT locale-gen "en_US.UTF-8"
 # set root password
 chroot $ROOT bash -c "echo root:root | chpasswd"
 
-# config network manager TODO
+# config network manager
 cat > $ROOT/etc/NetworkManager/NetworkManager.conf << EOF
 [main]
 plugins=ifupdown,keyfile
@@ -111,7 +105,7 @@ EOF
 # mkdir $ROOT/etc/systemd/system-generators
 # cp scripts/systemd/alt-root-mount-generator $ROOT/etc/systemd/system-generators
 
-# create console for ttyGS0
+# create console for ttyGS0 TODO serial-getty
 chroot $ROOT ln -s /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@ttyGS0.service
 
 # enable systemd-resolvd
@@ -120,6 +114,43 @@ ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
 
 # install node
 tar xf cache/node-v10.16.0-linux-arm64.tar.xz -C $ROOT/usr --strip-components=1
+
+# install winas
+mkdir -p $ROOT/root/winas
+tar xf $CACHE/$WINAS_TAR -C $ROOT/root/winas
+
+# install winasd and create systemd unit
+mkdir -p $ROOT/root/winasd
+tar xf $CACHE/$WINASD_TAR -C $ROOT/root/winasd
+
+cat > $ROOT/lib/systemd/system/winasd.service << EOF
+[unit]
+Description=Winas Daemon Service
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node ./src/app.js
+WorkingDirectory=/root/winasd
+Restart=always
+
+LimitNOFILE=infinity
+LimitCORE=inifinity
+StandardInput=null
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=winasd
+PIDFile=/run/winasd.pid
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# system-nspawn does not work properly
+ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.target.wants/winasd.service
 
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
