@@ -16,5 +16,5 @@ fi
 
 wget -O $TMP/$NODE_TAR $NODE_URL
 mv $TMP/$NODE_TAR $CACHE/$NODE_TAR
-echo "[${SCRIPT_NAME}]" $CACHE/$NODE_TAR is ready."
+echo "${SCRIPT_NAME}:" "$CACHE/$NODE_TAR is ready."
 

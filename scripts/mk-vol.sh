@@ -26,7 +26,7 @@ IMG=vol.img
 # create image file
 rm -rf $IMG
 # fallocate -l $((0xE70000 * 0x200)) $IMG
-fallocate -l $((0x80000000)) $IMG
+fallocate -l $((0xC0000000)) $IMG
 
 # mk root btrfs volume & mount
 mkfs.btrfs -U $root_vol -f $IMG
