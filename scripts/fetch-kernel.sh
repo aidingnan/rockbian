@@ -12,7 +12,7 @@ KERNEL_URL=https://cdn.kernel.org/pub/linux/kernel/v${MAIN_VER}.x/$KERNEL_TAR
 
 if [ -f $CACHE/$KERNEL_TAR ]; then exit; fi
 
-KTMP=$TMP/tmp_kernel
+KTMP=$TMP/tmp-kernel
 
 wget -O $KTMP $KERNEL_URL
 mv $KTMP $CACHE/$KERNEL_TAR

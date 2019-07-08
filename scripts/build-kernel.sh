@@ -5,9 +5,11 @@ set -e
 SCRIPT_DIR=$(dirname "$0")
 SCRIPT_NAME=$(basename "$0")
 
+$SCRIPT_DIR/fetch-kernel.sh
+
 source $SCRIPT_DIR/main.env
 
-KBUILD=$TMP/kbuild
+KBUILD=$TMP/kernel-build
 
 if [ -f $CACHE/$KERNEL_DEB ]; then
   echo "[${SCRIPT_NAME}] $CACHE/$KERNEL_DEB exists, skip building"
