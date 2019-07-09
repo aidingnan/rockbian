@@ -29,7 +29,8 @@ mkdir -p $ROOT
 tar xzf $CACHE/$DEBASE_TESTING_TAR -C $ROOT
 
 # !!! important, use qemu bin on host machine (Ubuntu 19.04 or Debian 10 or above)
-cp -av /usr/bin/qemu-aarch64-static $ROOT/usr/bin
+# qemu static should be placed inside debase tar
+# cp -av /usr/bin/qemu-aarch64-static $ROOT/usr/bin
 
 # TODO
 rm $ROOT/sbin/init

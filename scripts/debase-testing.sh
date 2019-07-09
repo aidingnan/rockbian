@@ -12,6 +12,8 @@ ECHO="echo ${SCRIPT_NAME}: "
 
 source $SCRIPT_DIR/main.env
 
+$SCRIPT_DIR/check-qemu.sh
+
 if [ -f $CACHE/$DEBASE_TESTING_TAR ]; then
   $ECHO "$CACHE/$DEBASE_TESTING_TAR exists, skip building"
   exit 0
