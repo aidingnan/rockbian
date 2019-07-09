@@ -19,7 +19,7 @@ fi
 SHA=${SHA:1:40}
 if  [ -f $UBOOT_ENV ]; then
   source $UBOOT_ENV
-  if [ "$UBOOT_SHA" == "$SHA" ] || [ -f $CACHE/$UBOOT_ZIP ]; then
+  if [ "$UBOOT_SHA" == "$SHA" ] && [ -f $CACHE/$UBOOT_ZIP ]; then
     $ECHO "$UBOOT_ZIP is up-to-date, skip downloading." 
     exit
   fi
@@ -28,8 +28,9 @@ fi
 $ECHO "Downloading uboot source @ commit ${SHA:0:7}"
 
 UBOOT_SHA=$SHA
-UBOOT_ZIP=uboot-${SHA:0:7}.zip
-UBOOT_IMG=uboot-${SHA:0:7}.img
+UBOOT_ZIP=u-boot-${SHA:0:7}.zip
+UBOOT_BIN=u-boot-dtb-${SHA:0:7}.bin
+UBOOT_IMG=u-boot-${SHA:0:7}.img
 
 TMPFILE=tmp/tmp-uboot
 
@@ -40,6 +41,7 @@ mv $TMPFILE $CACHE/$UBOOT_ZIP
 cat > $UBOOT_ENV << EOF
 UBOOT_SHA=$UBOOT_SHA
 UBOOT_ZIP=$UBOOT_ZIP
+UBOOT_BIN=$UBOOT_BIN
 UBOOT_IMG=$UBOOT_IMG
 EOF
 
