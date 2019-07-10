@@ -23,17 +23,20 @@ $ECHO "building $DEBASE_TESTING_TAR ..."
 
 DIR=$TMP/debase-testing
 
-INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,openssl,
-INCS+=curl,wget,file,unzip,vim,wget,file,unzip,stress-ng,
-INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,
+INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,
+INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,
+INCS+=nano,curl,wget,file,unzip,
+INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
-INCS+=openssh-server,network-manager
+INCS+=openssh-server,
+# INCS+=libimage-exiftool-perl,imagemagick,ffmpeg
+INCS+=iperf3,stress-ng
 
 rm -rf $DIR
 mkdir -p $DIR
 debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS  buster $DIR
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
 chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-tar czf $CACHE/$DEBASE_TESTING_TAR -C $DIR .
+tar cJf $CACHE/$DEBASE_TESTING_TAR -C $DIR .
 
 $ECHO "$DEBASE_TESTING_TAR is ready"

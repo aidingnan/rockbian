@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# debootstrap, binfmt-support, qemu-user-static
+#
+# required packages: debootstrap, binfmt-support, qemu-user-static
+#
 
 set -e
 
@@ -19,10 +21,15 @@ fi
 
 $ECHO "building $DEBASE_BUILD_TAR ..."
 
-WORKDIR=$TMP/debase-build
-rm -rf $WORKDIR
-mkdir -p $WORKDIR
-debootstrap --arch=arm64 --foreign --include=python2.7 --variant=buildd buster $WORKDIR
-cp -av /usr/bin/qemu-aarch64-static $WORKDIR/usr/bin
-chroot $WORKDIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-tar czf $CACHE/$DEBASE_BUILD_TAR -C $WORKDIR .
+DIR=$TMP/debase-build
+
+INCS=python2.7
+
+rm -rf $DIR
+mkdir -p $DIR
+debootstrap --arch=arm64 --foreign --variant=buildd --include=$INCS buster $DIR
+cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
+chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+tar cJf $CACHE/$DEBASE_BUILD_TAR -C $DIR .
+
+$ECHO "$DEBASE_BUILD_TAR is ready"

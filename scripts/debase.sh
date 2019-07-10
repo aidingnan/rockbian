@@ -21,25 +21,22 @@ fi
 
 $ECHO "building $DEBASE_TAR ..."
 
-# tzdata already in base
-INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,openssl,
-INCS+=curl,wget,file,unzip,
-# INCS+=python-minimal,build-essential,vim,git,wget,file,unzip,stress-ng,
-INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,
+DIR=$TMP/debase
+
+INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,
+INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,
+INCS+=nano,curl,wget,file,unzip,
+INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
-INCS+=openssh-server,network-manager,
-# INCS+=avahi-daemon,avahi-utils,
-# INCS+=samba,rsyslog
+INCS+=openssh-server,
 INCS+=libimage-exiftool-perl,imagemagick,ffmpeg
+# INCS+=iperf3,stress-ng
 
-WORKDIR=$TMP/debase
-
-rm -rf $WORKDIR
-mkdir -p $WORKDIR
-debootstrap --arch=arm64 --foreign --include=$INCS buster $WORKDIR
-cp -av /usr/bin/qemu-aarch64-static $WORKDIR/usr/bin
-chroot $WORKDIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-
-tar czf $CACHE/$DEBASE_TAR -C $WORKDIR .
+rm -rf $DIR
+mkdir -p $DIR
+debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR
+cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
+chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+tar cJf $CACHE/$DEBASE_TAR -C $DIR .
 
 $ECHO "$DEBASE_TAR is ready"
