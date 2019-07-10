@@ -26,7 +26,7 @@ ROOT=$TMP/rootfs
 rm -rf $ROOT
 mkdir -p $ROOT 
 
-tar xzf $CACHE/$DEBASE_TAR -C $ROOT
+tar xf $CACHE/$DEBASE_TAR -C $ROOT
 
 # TODO
 rm $ROOT/sbin/init
@@ -152,7 +152,7 @@ ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.tar
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
-tar czf $TMP/$ROOTFS_TAR -C $ROOT .
+tar cJf $TMP/$ROOTFS_TAR -C $ROOT .
 mv $TMP/$ROOTFS_TAR $CACHE/$ROOTFS_TAR
 
 $ECHO "$ROOTFS_TAR is ready"

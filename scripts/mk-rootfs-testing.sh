@@ -26,7 +26,7 @@ ROOT=$TMP/rootfs-testing
 rm -rf $ROOT
 mkdir -p $ROOT 
 
-tar xzf $CACHE/$DEBASE_TESTING_TAR -C $ROOT
+tar xf $CACHE/$DEBASE_TESTING_TAR -C $ROOT
 
 # TODO
 rm $ROOT/sbin/init
@@ -118,7 +118,7 @@ ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
-tar czf $TMP/$ROOTFS_TESTING_TAR -C $ROOT .
+tar cJf $TMP/$ROOTFS_TESTING_TAR -C $ROOT .
 mv $TMP/$ROOTFS_TESTING_TAR $CACHE/$ROOTFS_TESTING_TAR
 
 $ECHO "$ROOTFS_TESTING_TAR is ready"

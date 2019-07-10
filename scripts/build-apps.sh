@@ -73,7 +73,7 @@ if [ $BUILD_WINAS ]; then
   echo $WINAS_SHA > $ROOT/winas/.sha
   rm -rf $ROOT/winas/.git
   chroot $ROOT bash -c "cd /winas; PYTHON=/usr/bin/python2.7 npm i"
-  tar czf $CACHE/$WINAS_TAR -C $ROOT/winas .
+  tar cJf $CACHE/$WINAS_TAR -C $ROOT/winas .
 
 cat > $WINAS_ENV << EOF
 WINAS_SHA=$WINAS_SHA
@@ -89,7 +89,7 @@ if [ $BUILD_WINASD ]; then
   echo $WINASD_SHA > $ROOT/winasd/.sha
   rm -rf $ROOT/winasd/.git
   chroot $ROOT bash -c "cd winasd; PYTHON=/usr/bin/python2.7 npm i"
-  tar czf $CACHE/$WINASD_TAR -C $ROOT/winasd .
+  tar cJf $CACHE/$WINASD_TAR -C $ROOT/winasd .
 
 cat > $WINASD_ENV << EOF
 WINASD_SHA=$WINASD_SHA

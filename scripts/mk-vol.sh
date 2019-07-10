@@ -58,13 +58,13 @@ TMPVOL=$MNT/vols/$staging_subvol
 
 echo "creating initial subvol"
 btrfs subvolume create $TMPVOL
-tar xzf $CACHE/$ROOTFS_TAR -C $TMPVOL
+tar xf $CACHE/$ROOTFS_TAR -C $TMPVOL
 btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$initial_subvol
 btrfs subvolume delete $TMPVOL
 
 echo "creating testing subvol"
 btrfs subvolume create $TMPVOL
-tar xzf $CACHE/$ROOTFS_TESTING_TAR -C $TMPVOL
+tar xf $CACHE/$ROOTFS_TESTING_TAR -C $TMPVOL
 btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$testing_subvol
 btrfs subvolume delete $TMPVOL
 
@@ -75,5 +75,8 @@ echo "$working_subvol" > $MNT/refs/tags/working
 echo "$staging_subvol" > $MNT/refs/tags/staging
 
 sync
+
+xz -k $IMG
+mv $IMG.xz cache
 
 echo "vol.img is ready"
