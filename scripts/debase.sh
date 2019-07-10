@@ -22,7 +22,7 @@ fi
 $ECHO "building $DEBASE_TAR ..."
 
 # tzdata already in base
-INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,
+INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,openssl,
 INCS+=curl,wget,file,unzip,
 # INCS+=python-minimal,build-essential,vim,git,wget,file,unzip,stress-ng,
 INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,

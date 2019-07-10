@@ -23,7 +23,7 @@ $ECHO "building $DEBASE_TESTING_TAR ..."
 
 DIR=$TMP/debase-testing
 
-INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,
+INCS+=locales,nano,ifupdown,net-tools,zram-tools,xz-utils,parted,openssl,
 INCS+=curl,wget,file,unzip,vim,wget,file,unzip,stress-ng,
 INCS+=initramfs-tools,u-boot-tools,btrfs-progs,wireless-tools,i2c-tools,
 INCS+=bluez,bluez-tools,bluetooth,
