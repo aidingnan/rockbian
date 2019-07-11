@@ -102,8 +102,14 @@ EOF
 # mkdir $ROOT/etc/systemd/system-generators
 # cp scripts/systemd/alt-root-mount-generator $ROOT/etc/systemd/system-generators
 
-# create console for ttyGS0 TODO serial-getty
-chroot $ROOT ln -s /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@ttyGS0.service
+# serial-tty@ttyGS0
+chroot $ROOT ln -s /lib/systemd/system/serial-getty@.service /etc/systemd/system/getty.target.wants/serial-getty@ttyGS0.service
+
+# overriding serial-getty@ttyGS0
+mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
+cat > $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/override.conf << EOF
+ConditionPathExists=/run/cowroot/root/boot/.root
+EOF
 
 # enable systemd-resolvd
 chroot $ROOT systemctl enable systemd-resolved
