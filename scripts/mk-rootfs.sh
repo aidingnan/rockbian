@@ -98,11 +98,7 @@ managed=true
 wifi.scan-rand-mac-address=no
 EOF
 
-# create system generator for mounting alt root
-# mkdir $ROOT/etc/systemd/system-generators
-# cp scripts/systemd/alt-root-mount-generator $ROOT/etc/systemd/system-generators
-
-# serial-tty@ttyGS0
+# enable serial-tty@ttyGS0
 chroot $ROOT ln -s /lib/systemd/system/serial-getty@.service /etc/systemd/system/getty.target.wants/serial-getty@ttyGS0.service
 
 # overriding serial-getty@ttyGS0
@@ -127,7 +123,7 @@ mkdir -p $ROOT/root/winasd
 tar xf $CACHE/$WINASD_TAR -C $ROOT/root/winasd
 
 cat > $ROOT/lib/systemd/system/winasd.service << EOF
-[unit]
+[Unit]
 Description=Winas Daemon Service
 Requires=network.target
 After=network.target
@@ -139,7 +135,7 @@ WorkingDirectory=/root/winasd
 Restart=always
 
 LimitNOFILE=infinity
-LimitCORE=inifinity
+LimitCORE=infinity
 StandardInput=null
 StandardOutput=syslog
 StandardError=syslog
@@ -152,7 +148,6 @@ Group=root
 WantedBy=multi-user.target
 EOF
 
-# system-nspawn does not work properly
 ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.target.wants/winasd.service
 
 $ECHO "installing kernel"
