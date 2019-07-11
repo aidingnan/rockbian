@@ -29,7 +29,7 @@ INCS+=nano,curl,wget,file,unzip,
 INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
 INCS+=openssh-server,
-INCS+=libimage-exiftool-perl,imagemagick,ffmpeg
+INCS+=libimage-exiftool-perl,imagemagick,ffmpeg,
 INCS+=iperf3,stress-ng
 
 rm -rf $DIR
