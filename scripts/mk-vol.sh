@@ -58,7 +58,7 @@ TMPVOL=$MNT/vols/$staging_subvol
 
 echo "creating initial subvol"
 btrfs subvolume create $TMPVOL
-tar xf $CACHE/$ROOTFS_TAR -C $TMPVOL
+tar xf $CACHE/$ROOTFS_TAR --zstd -C $TMPVOL
 btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$initial_subvol
 btrfs subvolume delete $TMPVOL
 

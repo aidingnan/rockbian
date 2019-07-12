@@ -160,7 +160,7 @@ ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.tar
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
-tar cf $TMP/$ROOTFS_TAR -C $ROOT .
+tar cf $TMP/$ROOTFS_TAR --zstd -C $ROOT .
 mv $TMP/$ROOTFS_TAR $CACHE/$ROOTFS_TAR
 
 $ECHO "$ROOTFS_TAR is ready"
