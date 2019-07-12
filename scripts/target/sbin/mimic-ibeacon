@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -x
+
+#sudo hcitool -i hcix cmd <OGF> <OCF> <No. Significant Data Octets> <iBeacon Prefix> <UUID> <Major> <Minor> <Tx Power> <Placeholder Octets>
+
+PREFIX="1E 02 01 1A 1A FF 4C 00 02 15"
+
+UUID="4a 4e ce 60 7e b0 11 e4 b4 a9 08 00 20 0c 9a 66"
+
+MAJOR="00 01"
+MINOR="00 00"
+POWER="C5 00"
+
+
+# advertise
+hcitool -i hci0 0x08 0x0008 $PREFIX $UUID $MAJOR $MINOR $POWER
+hcitool -i hci0 0x08 0x0006 A0 00 A0 00 00 00 00 00 00 00 00 00 00 07 00
+hcitool -i hci0 0x08 0x000a 01
+
+echo "complete"
