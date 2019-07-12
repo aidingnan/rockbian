@@ -77,7 +77,7 @@ echo "$staging_subvol" > $MNT/refs/tags/staging
 sync
 umount $MNT
 
-xz $IMG
-mv $IMG.xz cache
+zstd $IMG
+mv $IMG.zst cache
 
-echo "$IMG.xz is ready"
+echo "$IMG.zstt is ready"
