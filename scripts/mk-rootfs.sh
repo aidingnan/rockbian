@@ -94,6 +94,12 @@ plugins=ifupdown,keyfile
 [ifupdown]
 managed=true
 
+[logging]
+level=DEBUG
+
+[connection]
+wifi.powersave=2
+
 [device]
 wifi.scan-rand-mac-address=no
 EOF
