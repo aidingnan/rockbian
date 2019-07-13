@@ -69,11 +69,11 @@ fi
 if [ $BUILD_WINAS ]; then
   git clone https://github.com/aidingnan/winas $ROOT/winas
   WINAS_SHA=$(GIT_DIR=$ROOT/winas/.git git rev-parse HEAD)
-  WINAS_TAR=winas-master-${WINAS_SHA:0:7}.tar.gz
+  WINAS_TAR=winas-master-${WINAS_SHA:0:7}.tar.zst
   echo $WINAS_SHA > $ROOT/winas/.sha
   rm -rf $ROOT/winas/.git
   chroot $ROOT bash -c "cd /winas; PYTHON=/usr/bin/python2.7 npm i"
-  tar cJf $CACHE/$WINAS_TAR -C $ROOT/winas .
+  tar cf $CACHE/$WINAS_TAR --zstd -C $ROOT/winas .
 
 cat > $WINAS_ENV << EOF
 WINAS_SHA=$WINAS_SHA
@@ -85,11 +85,11 @@ fi
 if [ $BUILD_WINASD ]; then
   git clone https://github.com/aidingnan/winasd $ROOT/winasd
   WINASD_SHA=$(GIT_DIR=$ROOT/winasd/.git git rev-parse HEAD)
-  WINASD_TAR=winasd-master-${WINASD_SHA:0:7}.tar.gz
+  WINASD_TAR=winasd-master-${WINASD_SHA:0:7}.tar.zst
   echo $WINASD_SHA > $ROOT/winasd/.sha
   rm -rf $ROOT/winasd/.git
   chroot $ROOT bash -c "cd winasd; PYTHON=/usr/bin/python2.7 npm i"
-  tar cJf $CACHE/$WINASD_TAR -C $ROOT/winasd .
+  tar cf $CACHE/$WINASD_TAR --zstd -C $ROOT/winasd .
 
 cat > $WINASD_ENV << EOF
 WINASD_SHA=$WINASD_SHA
