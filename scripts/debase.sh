@@ -34,9 +34,9 @@ INCS+=iperf3,stress-ng
 
 rm -rf $DIR
 mkdir -p $DIR
-debootstrap --arch=arm64 --foreign --include=$INCS buster $DIR
+debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
 chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-tar cJf $CACHE/$DEBASE_TAR -C $DIR .
+tar cf $CACHE/$DEBASE_TAR --zstd -C $DIR .
 
 $ECHO "$DEBASE_TAR is ready"

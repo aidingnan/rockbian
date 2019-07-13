@@ -30,6 +30,6 @@ mkdir -p $DIR
 debootstrap --arch=arm64 --foreign --variant=buildd --include=$INCS buster $DIR
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
 chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-tar cJf $CACHE/$DEBASE_BUILD_TAR -C $DIR .
+tar cf $CACHE/$DEBASE_BUILD_TAR --zstd -C $DIR .
 
 $ECHO "$DEBASE_BUILD_TAR is ready"

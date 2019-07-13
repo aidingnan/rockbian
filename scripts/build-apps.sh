@@ -59,7 +59,7 @@ if [ $BULD_WINAS ] || [ $BUILD_WINASD ]; then
   rm -rf $ROOT
   mkdir -p $ROOT
 
-  tar xf $CACHE/$DEBASE_BUILD_TAR -C $ROOT
+  tar xf $CACHE/$DEBASE_BUILD_TAR --zstd -C $ROOT
   # cp -av /usr/bin/qemu-aarch64-static $ROOT/usr/bin
   tar xf $CACHE/$NODE_TAR -C $ROOT/usr --strip-components=1
   # chroot $ROOT npm install -g npm

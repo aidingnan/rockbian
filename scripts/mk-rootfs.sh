@@ -26,7 +26,7 @@ ROOT=$TMP/rootfs
 rm -rf $ROOT
 mkdir -p $ROOT 
 
-tar xf $CACHE/$DEBASE_TAR -C $ROOT
+tar xf $CACHE/$DEBASE_TAR --zstd -C $ROOT
 
 # TODO
 rm $ROOT/sbin/init
