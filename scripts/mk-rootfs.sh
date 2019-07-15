@@ -28,8 +28,6 @@ mkdir -p $ROOT
 
 tar xf $CACHE/$DEBASE_TAR --zstd -C $ROOT
 
-# TODO
-rm $ROOT/sbin/init
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
@@ -108,10 +106,11 @@ EOF
 # chroot $ROOT ln -s /lib/systemd/system/serial-getty@.service /etc/systemd/system/getty.target.wants/serial-getty@ttyGS0.service
 
 # overriding serial-getty@ttyGS0
-# mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
-# cat > $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/override.conf << EOF
-# ConditionPathExists=/run/cowroot/root/boot/.root
-# EOF
+mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
+cat > $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/override.conf << EOF
+ConditionPathExists=/run/cowroot/root/boot/.root
+EOF
+chroot $ROOT systemctl enable serial-getty@ttyGS0.service
 
 # enable systemd-resolvd
 chroot $ROOT systemctl enable systemd-resolved

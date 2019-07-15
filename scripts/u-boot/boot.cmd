@@ -93,14 +93,16 @@ ROOTFLAGS="rootflags=subvol=/vols/${loader_r} ro rootwait rootfstype=btrfs"
 CONSOLE="console=tty0 console=ttyS2,1500000"
 LOG="loglevel=0"
 COWROOTFLAGS="cowrootflags=l=${loader_l},r=${loader_r},op=${loader_op}"
+INIT="init=/sbin/cowroot-init"
 
 echo ${ROOT}
 echo ${ROOTFLAGS}
 echo ${CONSOLE}
 echo ${LOG}
 echo ${COWROOTFLAGS}
+echo ${INIT}
 
-setenv bootargs "${ROOT} ${ROOTFLAGS} ${CONSOLE} ${LOG} ${COWROOTFLAGS}"
+setenv bootargs "${ROOT} ${ROOTFLAGS} ${CONSOLE} ${LOG} ${COWROOTFLAGS} ${INIT}"
 
 SUBVOL_BOOT="/vols/${loader_r}/boot"
 
