@@ -36,12 +36,10 @@ LOG=$TMP/debase.log
 
 rm -rf $DIR
 mkdir -p $DIR
-debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR > $LOG
+bash -c "$LOCALE_ENV \
+  debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR"
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
-chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
-
-mkdir -p $DIR/root/log
-mv $LOG $DIR/root/log
+chroot $DIR /bin/bash -c "$LOCALE_ENV /debootstrap/debootstrap --second-stage"
 tar cf $CACHE/$DEBASE_TAR --zstd -C $DIR .
 
 $ECHO "$DEBASE_TAR is ready"

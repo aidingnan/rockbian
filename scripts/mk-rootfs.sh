@@ -68,15 +68,44 @@ auto lo
 iface lo inet loopback
 EOF
 
-# hostname
-chroot $ROOT hostnamectl set-hostname "winas"
+# hostnamectl does not work in chroot
+# chroot $ROOT hostnamectl set-hostname "winas"
+echo "winas" > $ROOT/etc/hostname
 
 # locale
-chroot $ROOT locale-gen "en_US.UTF-8"
-chroot $ROOT set-locale "en_US.UTF-8"
+sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' $ROOT/etc/locale.gen
+#  echo 'LANG="en_US.UTF-8"'> $ROOT/etc/default/locale
+cat > $ROOT/etc/default/locale << EOF
+LANG=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_ADDRESS=en_US.UTF-8
+LC_PAPER=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_MONETARY=en_US.UTF-8
+LC_TIME=en_US.UTF-8
+LC_NUMERIC=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
+EOF
+chroot $ROOT bash -c "$LOCALE_ENV dpkg-reconfigure --frontend=noninteractive locales"
+chroot $ROOT bash -c "$LOCALE_ENV update-locale \
+LANGUAGE \
+LC_ALL \
+LC_TIME=en_US.UTF-8 \
+LC_MONETARY=en_US.UTF-8 \
+LC_ADDRESS=en_US.UTF-8 \
+LC_TELEPHONE=en_US.UTF-8 \
+LC_NAME=en_US.UTF-8 \
+LC_MEASUREMENT=en_US.UTF-8 \
+LC_IDENTIFICATION=en_US.UTF-8 \
+LC_NUMERIC=en_US.UTF-8 \
+LC_PAPER=en_US.UTF-8 \
+LANG=en_US.UTF-8"
 
 # timezone
-chroot $ROOT timedatectl set-timezone "Asia/Shanghai"
+rm $ROOT/etc/localtime
+echo "Asia/Shanghai" > $ROOT/etc/timezone
+chroot $ROOT bash -c "$LOCALE_ENV dpkg-reconfigure -f noninteractive tzdata"
 
 # set root password
 chroot $ROOT bash -c "echo root:root | chpasswd"
