@@ -90,10 +90,7 @@ cat > $ROOT/etc/NetworkManager/NetworkManager.conf << EOF
 plugins=ifupdown,keyfile
 
 [ifupdown]
-managed=true
-
-[logging]
-level=DEBUG
+managed=false
 
 [connection]
 wifi.powersave=2
