@@ -32,11 +32,16 @@ INCS+=openssh-server,
 INCS+=libimage-exiftool-perl,imagemagick,ffmpeg,
 INCS+=iperf3,stress-ng
 
+LOG=$TMP/debase.log
+
 rm -rf $DIR
 mkdir -p $DIR
-debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR
+debootstrap --arch=arm64 --foreign --variant=minbase --include=$INCS buster $DIR > $LOG
 cp -av /usr/bin/qemu-aarch64-static $DIR/usr/bin
 chroot $DIR /bin/bash -c "LANG=C /debootstrap/debootstrap --second-stage"
+
+mkdir -p $DIR/root/log
+mv $LOG $DIR/root/log
 tar cf $CACHE/$DEBASE_TAR --zstd -C $DIR .
 
 $ECHO "$DEBASE_TAR is ready"
