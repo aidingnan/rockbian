@@ -11,13 +11,13 @@ if [ -d /sys/kernel/config/usb_gadget ]; then
   mkdir strings/0x409
   echo "0" > strings/0x409/serialnumber 
   echo "Dingnan" > strings/0x409/manufacturer 
-  echo "Pocket Drive" > strings/0x409/product
+  echo "Net Drive" > strings/0x409/product
   mkdir functions/acm.GS0
   mkdir functions/acm.GS1
   mkdir functions/acm.GS2
   mkdir configs/c.1
   mkdir configs/c.1/strings/0x409
-  echo "CDC 3xACM" > configs/c.1/strings/0x409/configuration
+  echo "3 CDC-ACM" > configs/c.1/strings/0x409/configuration
   ln -s functions/acm.GS0 configs/c.1
   ln -s functions/acm.GS1 configs/c.1
   ln -s functions/acm.GS2 configs/c.1
