@@ -80,4 +80,4 @@ umount $MNT
 zstd $IMG
 mv $IMG.zst cache
 
-echo "$IMG.zstt is ready"
+echo "$IMG.zst is ready"
