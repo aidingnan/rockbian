@@ -56,11 +56,6 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 EOF
 
-# set up hostname
-cat > $ROOT/etc/hostname << EOF
-winas
-EOF
-
 # set up network interfaces
 cat > $ROOT/etc/network/interfaces << EOF
 # interfaces(5) file used by ifup(8) and ifdown(8)
@@ -73,13 +68,15 @@ auto lo
 iface lo inet loopback
 EOF
 
-# set up timezone
-cat > $ROOT/etc/timezone << EOF
-Asia/Shanghai
-EOF
+# hostname
+chroot $ROOT hostnamectl set-hostname "winas"
 
-# generate locale
+# locale
 chroot $ROOT locale-gen "en_US.UTF-8"
+chroot $ROOT set-locale "en_US.UTF-8"
+
+# timezone
+chroot $ROOT timedatectl set-timezone "Asia/Shanghai"
 
 # set root password
 chroot $ROOT bash -c "echo root:root | chpasswd"
@@ -99,8 +96,10 @@ wifi.powersave=2
 wifi.scan-rand-mac-address=no
 EOF
 
-# enable serial-tty@ttyGS0
-# chroot $ROOT ln -s /lib/systemd/system/serial-getty@.service /etc/systemd/system/getty.target.wants/serial-getty@ttyGS0.service
+# fix haveged conf quirk
+cat > $ROOT/etc/default/haveged << EOF
+DAEMON_ARGS="-d 16 -w 1024"
+EOF
 
 # overriding serial-getty@ttyGS0
 mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
