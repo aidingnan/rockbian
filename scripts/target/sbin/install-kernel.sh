@@ -36,5 +36,6 @@ rm -rf /boot/initrd.img-${VER}
 
 # update dtbs
 rm -rf /boot/dtbs
-ln -s /usr/lib/linux-image-${VER} /boot/dtbs
-
+mkdir -p /boot/dtbs
+# ln -s /usr/lib/linux-image-${VER} /boot/dtbs
+cp -a /usr/lib/linux-image-${VER}/. /boot/dtbs/
