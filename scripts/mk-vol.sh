@@ -78,6 +78,7 @@ sync
 umount $MNT
 
 zstd $IMG
+mv $IMG cache
 mv $IMG.zst cache
 
 echo "$IMG.zst is ready"
