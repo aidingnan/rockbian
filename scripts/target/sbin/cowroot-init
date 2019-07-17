@@ -121,6 +121,7 @@ umount /ro-root
 rm -rf /ro-root
 
 echo "start systemd..."
+/sbin/config-usb-gadget.sh
 exec /lib/systemd/systemd
 END
 )"
