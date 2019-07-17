@@ -8,7 +8,6 @@ ECHO="echo $SCRIPT_NAME:"
 
 # dependencies
 $SCRIPT_DIR/mk-rootfs.sh
-# $SCRIPT_DIR/mk-rootfs-testing.sh
 
 source $SCRIPT_DIR/main.env
 
@@ -17,7 +16,6 @@ root_vol=e383f6f7-6572-46a9-a7fa-2e0633015231           # root vol
 working_subvol=ebcc3123-127a-4d26-b083-38e8c0bf7f09     # rw / working subvol, not used in script
 staging_subvol=07371046-38a3-43d5-9ded-d92584d7e751     # tmp / staging subvol 
 initial_subvol=$(cat /proc/sys/kernel/random/uuid)      # initial subvol
-# testing_subvol=$(cat /proc/sys/kernel/random/uuid)      # testing subvol
 
 # mount point & image file name
 MNT=mntvol
@@ -62,12 +60,6 @@ tar xf $CACHE/$ROOTFS_TAR --zstd -C $TMPVOL
 btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$initial_subvol
 btrfs subvolume delete $TMPVOL
 
-# echo "creating testing subvol"
-# btrfs subvolume create $TMPVOL
-# tar xf $CACHE/$ROOTFS_TESTING_TAR -C $TMPVOL
-# btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$testing_subvol
-# btrfs subvolume delete $TMPVOL
-
 echo "save subvol tags"
 echo "$initial_subvol" > $MNT/refs/tags/initial
 # echo "$testing_subvol" > $MNT/refs/tags/testing
@@ -81,4 +73,4 @@ zstd $IMG
 mv $IMG cache
 mv $IMG.zst cache
 
-echo "$IMG.zst is ready"
+echo "vol.img and vol.img.zst are ready"
