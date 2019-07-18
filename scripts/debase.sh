@@ -24,7 +24,7 @@ $ECHO "building $DEBASE_TAR ..."
 DIR=$TMP/debase
 
 INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,haveged,zstd,
-INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,
+INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,rfkill,
 INCS+=nano,curl,wget,file,unzip,
 INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
