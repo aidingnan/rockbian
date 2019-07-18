@@ -24,7 +24,7 @@ IMG=$TMP/vol.img
 # create image file
 rm -rf $IMG
 # fallocate -l $((0xE70000 * 0x200)) $IMG
-fallocate -l $((0x80000000)) $IMG
+fallocate -l $((0x40000000)) $IMG
 
 # mk root btrfs volume & mount
 mkfs.btrfs -U $root_vol -f $IMG
@@ -56,13 +56,17 @@ TMPVOL=$MNT/vols/$staging_subvol
 
 echo "creating initial subvol"
 btrfs subvolume create $TMPVOL
+for i in bin etc lib root sbin usr var
+do
+  mkdir $TMPVOL/$i
+  chattr +c $TMPVOL/$i
+done
 tar xf $CACHE/$ROOTFS_TAR --zstd -C $TMPVOL
 btrfs subvolume snapshot -r $TMPVOL $MNT/vols/$initial_subvol
 btrfs subvolume delete $TMPVOL
 
 echo "save subvol tags"
 echo "$initial_subvol" > $MNT/refs/tags/initial
-# echo "$testing_subvol" > $MNT/refs/tags/testing
 echo "$working_subvol" > $MNT/refs/tags/working
 echo "$staging_subvol" > $MNT/refs/tags/staging
 
