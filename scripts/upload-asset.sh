@@ -12,14 +12,17 @@
 # * repo
 # * tag
 # * filename
-# * github_api_token
+# * token
 #
 # Script to upload a release asset using the GitHub API v3.
 #
 # Example:
 #
-# upload-github-release-asset.sh github_api_token=TOKEN owner=stefanbuck repo=playground tag=v0.1.0 filename=./build.zip
+# upload-asset.sh token=TOKEN tag=v0.1.0 filename=./build.zip
 #
+
+owner=aidingnan
+repo=rockbian
 
 # Check dependencies.
 set -e
@@ -38,7 +41,7 @@ done
 GH_API="https://api.github.com"
 GH_REPO="$GH_API/repos/$owner/$repo"
 GH_TAGS="$GH_REPO/releases/tags/$tag"
-AUTH="Authorization: token $github_api_token"
+AUTH="Authorization: token $token"
 WGET_ARGS="--content-disposition --auth-no-challenge --no-cookie"
 CURL_ARGS="-LJO#"
 
@@ -62,5 +65,5 @@ echo "Uploading asset... "
 # Construct url
 GH_ASSET="https://uploads.github.com/repos/$owner/$repo/releases/$id/assets?name=$(basename $filename)"
 
-curl "$GITHUB_OAUTH_BASIC" --data-binary @"$filename" -H "Authorization: token $github_api_token" -H "Content-Type: application/octet-stream" $GH_ASSET
+curl "$GITHUB_OAUTH_BASIC" --data-binary @"$filename" -H "Authorization: token $token" -H "Content-Type: application/octet-stream" $GH_ASSET
 
