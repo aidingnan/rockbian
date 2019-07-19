@@ -174,6 +174,25 @@ EOF
 # EOF
 # chroot $ROOT systemctl enable usb-gadget.service
 
+# This file is part of the ev3-systemd package
+
+cat > $ROOT/lib/system/system/config-usb-gadget.service << EOF
+[Unit]
+Description=Config USB Gadget using Configfs
+ConditionPathIsDirectory=/sys/kernel/config/usb_gadget
+Before=network.target
+BindsTo=sys-subsystem-udc-devices-%i.device
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/config-usb-rndis.sh up %i
+ExecStop=/sbin/config-usb-rndis.sh down %i
+
+[Install]
+WantedBy=network.target
+EOF
+
 # overriding serial-getty@ttyGS0
 mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
 cat > $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/override.conf << EOF
