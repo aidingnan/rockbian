@@ -135,63 +135,21 @@ cat > $ROOT/etc/default/haveged << EOF
 DAEMON_ARGS="-d 16 -w 1024"
 EOF
 
-# TODO use cowroot-init instead, workaround
-# # systemd usb-gadget target
-# if [ ! -f $ROOT/lib/systemd/system/usb-gadget.target ]; then 
-# cat > $ROOT/lib/systemd/system/usb-gadget.target << EOF
-# #  SPDX-License-Identifier: LGPL-2.1+
-# #
-# #  This file is part of systemd.
-# #
-# #  systemd is free software; you can redistribute it and/or modify it
-# #  under the terms of the GNU Lesser General Public License as published by
-# #  the Free Software Foundation; either version 2.1 of the License, or
-# #  (at your option) any later version.
-# 
-# [Unit]
-# Description=Hardware activated USB gadget
-# Documentation=man:systemd.special(7)
-# EOF
-# fi
-# 
-# # systemd udc rule TODO avoid existing
-# sed '/^SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device",.*/a SUBSYSTEM=="udc", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_WANTS}+="usb-gadget.target"' $ROOT/lib/udev/rules.d/99-systemd.rules
-# 
-# # usb gadget service 
-# cat > $ROOT/lib/systemd/system/usb-gadget.service << EOF
-# [Unit]
-# Description=Config USB gadget
-# Requires=sys-kernel-config.mount
-# After=sys-kernel-config.mount
-# 
-# [Service]
-# Type=simple
-# ExecStart=/sbin/config-usb-gadget.sh
-# RemainAfterExit=yes
-# 
-# [Install]
-# WantedBy=usb-gadget.target
-# EOF
-# chroot $ROOT systemctl enable usb-gadget.service
-
-# This file is part of the ev3-systemd package
-
 cat > $ROOT/lib/systemd/system/config-usb-gadget.service << EOF
 [Unit]
-Description=Config USB Gadget using Configfs
+Description=Config USB Gadget
 ConditionPathIsDirectory=/sys/kernel/config/usb_gadget
 Before=network.target
-BindsTo=sys-subsystem-udc-devices-%i.device
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/sbin/config-usb-rndis.sh up %i
-ExecStop=/sbin/config-usb-rndis.sh down %i
+ExecStart=/sbin/config-usb-rndis.sh
 
 [Install]
 WantedBy=network.target
 EOF
+chroot $ROOT systemctl enable config-usb-gadget.service
 
 # overriding serial-getty@ttyGS0
 mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
