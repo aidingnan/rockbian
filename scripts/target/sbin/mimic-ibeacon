@@ -1,21 +1,53 @@
 #!/bin/bash
+#
+# Terminology:
+#   OGF, Operation Group Field = Bluetooth Command Group = 0x08
+#   OCF, Operation Command Field
+#
+# ref: (none of them are accurate in all details)
+#   http://www.theregister.co.uk/Print/2013/11/29/feature_diy_apple_ibeacons/
+#   https://os.mbed.com/blog/entry/BLE-Beacons-URIBeacon-AltBeacons-iBeacon/
+#   https://stackoverflow.com/questions/18906988/what-is-the-ibeacon-bluetooth-profile/19040616#19040616
 
-set -x
+LE_OGF=0x08                                               # 7.8 LE CONTROLLER COMMANDS (page 806)
 
-#sudo hcitool -i hcix cmd <OGF> <OCF> <No. Significant Data Octets> <iBeacon Prefix> <UUID> <Major> <Minor> <Tx Power> <Placeholder Octets>
-
-PREFIX="1E 02 01 1A 1A FF 4C 00 02 15"
-
-UUID="4a 4e ce 60 7e b0 11 e4 b4 a9 08 00 20 0c 9a 66"
-
-MAJOR="00 01"
+HCI_LE_Set_Advertising_Data="0x0008"                      # # 7.8.7 LE Set Advertising Data Command (page 816)
+Advertising_Data_Length="1E"                              # 1 octet
+AD_STRUCT1="02 01 1A"                                     # 02, Number of bytes that follow in first AD structure
+                                                          # 01 # Flags AD type
+                                                          # 1A # Flags value 0x1A = 000011010  
+                                                          #    bit 0 (OFF) LE Limited Discoverable Mode
+                                                          #    bit 1 (ON) LE General Discoverable Mode
+                                                          #    bit 2 (OFF) BR/EDR Not Supported
+                                                          #    bit 3 (ON) Simultaneous LE and BR/EDR to Same Device Capable (controller)
+                                                          #    bit 4 (ON) Simultaneous LE and BR/EDR to Same Device Capable (Host)
+UUID="e2 c5 6d b5 df fb 48 d2 b0 60 d0 f5 a7 10 96 e0"    # iBeacon proximity uuid
+MAJOR="00 00"
 MINOR="00 00"
-POWER="C5 00"
+POWER="C5"                                                # The 2's complement of the calibrated Tx Power
+AD_STRUCT2="1A FF 4C 00 02 15 $UUID $MAJOR $MINOR $POWER" # 1A # Number of bytes that follow in second (and last) AD structure
+                                                          # FF # Manufacturer specific data AD type
+                                                          # 4C 00 # Company identifier code (0x004C == Apple)
+                                                          # 02 is a secondary ID that denotes a proximity beacon, which is used by all iBeacons.
+                                                          # 15 defines the remaining length to be 21 bytes (16+2+2+1).
+Advertising_Data="$AD_STRUCT1 $AD_STRUCT2 00"             # 31 octet, pad one zero octet (non significant part)
 
+hcitool -i hci0 cmd $LE_OGF $HCI_LE_Set_Advertising_Data $Advertising_Data_Length $Advertising_Data
 
-# advertise
-hcitool -i hci0 0x08 0x0008 $PREFIX $UUID $MAJOR $MINOR $POWER
-hcitool -i hci0 0x08 0x0006 A0 00 A0 00 00 00 00 00 00 00 00 00 00 07 00
-hcitool -i hci0 0x08 0x000a 01
+HCI_LE_Set_Advertising_Parameters="0x0006"                # 7.8.5 LE Set Advertising Parameters Command (page 812)
+Advertising_Interval_Min="A0 00"                          # 2 octets, 100ms
+Advertising_Interval_Max="A0 00"                          # 2 octets, 100ms
+Advertising_Type="00"                                     # 1 octet, Connectable undirected advertising (ADV_IND), ( default )
+Own_Address_Type="00"                                     # 1 octet, Public Device Address ( default )
+Direct_Address_Type="00"                                  # 1 octet, Public Device Address ( default )
+Direct_Address="00 00 00 00 00 00"                        # 6 octets
+Advertising_Channel_Map="07"                              # 1 octet, Enable channel 37/38/39, bit-ORed  
+Advertising_Filter_Policy="00"                            # 1 octet, Allow Scan Request from Any, Allow Connect Request from Any ( default ).
 
-echo "complete"
+hcitool -i hci0 cmd $LE_OGF $HCI_LE_Set_Advertising_Parameters \
+  $Advertising_Interval_Min $Advertising_Interval_Max $Advertising_Type \
+  $Own_Address_Type $Direct_Address_Type $Direct_Address \
+  $Advertising_Channel_Map $Advertising_Filter_Policy
+
+HCI_LE_Set_Advertise_Enable=0x000a                        # 7.8.9 LE Set Advertise Enable Command (page 818)
+hcitool -i hci0 cmd $LE_OGF $HCI_LE_Set_Advertise_Enable 01       # 1 octet, true  
