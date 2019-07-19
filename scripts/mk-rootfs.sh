@@ -176,7 +176,7 @@ EOF
 
 # This file is part of the ev3-systemd package
 
-cat > $ROOT/lib/system/system/config-usb-gadget.service << EOF
+cat > $ROOT/lib/systemd/system/config-usb-gadget.service << EOF
 [Unit]
 Description=Config USB Gadget using Configfs
 ConditionPathIsDirectory=/sys/kernel/config/usb_gadget
