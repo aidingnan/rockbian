@@ -66,6 +66,16 @@ cat > $ROOT/etc/network/interfaces << EOF
 
 auto lo
 iface lo inet loopback
+
+auto usb0
+iface usb0 inet static
+  address 192.168.227.2
+  netmask 255.255.255.0
+
+auto usb1
+iface usb1 inet static
+  address 192.168.227.3
+  netmask 255.255.255.0
 EOF
 
 # hostnamectl does not work in chroot
