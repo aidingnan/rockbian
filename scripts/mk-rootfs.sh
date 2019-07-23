@@ -156,7 +156,7 @@ Before=network.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/sbin/config-usb-rndis.sh
+ExecStart=/sbin/config-usb-composite.sh
 
 [Install]
 WantedBy=network.target
