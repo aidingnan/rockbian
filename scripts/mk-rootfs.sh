@@ -30,6 +30,7 @@ mkdir -p $ROOT
 tar xf $CACHE/$DEBASE_TAR --zstd -C $ROOT
 
 cp $CACHE/$ATECC_BIN $ROOT/sbin
+chmod a+x $ROOT/sbin/$ATECC_BIN
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
