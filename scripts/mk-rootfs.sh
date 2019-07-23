@@ -137,6 +137,10 @@ wifi.powersave=2
 wifi.scan-rand-mac-address=no
 EOF
 
+rm -rf $ROOT/etc/NetworkManager/system-connections/
+mkdir -p $ROOT/etc/NetworkManager/
+ln -s /run/cowroot/root/data/nm-connections $ROOT/etc/NetworkManager/system-connections
+
 # config zram
 if [ -f $ROOT/etc/default/zramswap.conf ]; then
   sed -i -e 's/#PERCENTAGE=10/PERCENTAGE=45/' $ROOT/etc/default/zramswap.conf

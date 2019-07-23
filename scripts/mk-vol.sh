@@ -35,7 +35,7 @@ mount -o loop $IMG $MNT
 mkdir -p $MNT/boot
 mkdir -p $MNT/vols
 mkdir -p $MNT/refs/tags
-mkdir -p $MNT/data
+mkdir -p $MNT/data/nm-connections # not neccessarily
 
 # boot from testing in rooted mode
 touch $MNT/boot/.root
