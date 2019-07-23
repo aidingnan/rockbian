@@ -9,6 +9,7 @@ ECHO="echo $SCRIPT_NAME:"
 # dependencies
 $SCRIPT_DIR/build-kernel.sh
 $SCRIPT_DIR/debase.sh
+$SCRIPT_DIR/fetch-atecc.sh
 $SCRIPT_DIR/fetch-node.sh
 $SCRIPT_DIR/build-apps.sh
 
@@ -28,6 +29,7 @@ mkdir -p $ROOT
 
 tar xf $CACHE/$DEBASE_TAR --zstd -C $ROOT
 
+cp scripts/$ATECC_BIN $ROOT/sbin
 cp scripts/target/sbin/* $ROOT/sbin
 
 mkdir -p $ROOT/lib/firmware
