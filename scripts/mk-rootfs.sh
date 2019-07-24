@@ -77,7 +77,7 @@ rm -rf $ROOT/etc/machine-id
 ln -s "/run/cowroot/root/data/init/machine-id" $ROOT/etc/machine-id
 
 # locale
-sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' $ROOT/etc/locale.gen
+sed -i 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' $ROOT/etc/locale.gen
 #  echo 'LANG="en_US.UTF-8"'> $ROOT/etc/default/locale
 cat > $ROOT/etc/default/locale << EOF
 LANG=en_US.UTF-8
@@ -130,7 +130,7 @@ wifi.scan-rand-mac-address=no
 EOF
 
 # let nm manage usb net
-sed 's/^ENV{DEVTYPE}=="gadget"/# ENV{DEVTYPE}=="gadget"/' $ROOT/lib/udev/rules.d/85-nm-unmanaged.rules
+sed -i 's/^ENV{DEVTYPE}=="gadget"/# ENV{DEVTYPE}=="gadget"/' $ROOT/lib/udev/rules.d/85-nm-unmanaged.rules
 
 # symlink connections
 rm -rf $ROOT/etc/NetworkManager/system-connections/
