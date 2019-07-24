@@ -132,11 +132,12 @@ EOF
 # let nm manage usb net
 sed -i 's/^ENV{DEVTYPE}=="gadget"/# ENV{DEVTYPE}=="gadget"/' $ROOT/lib/udev/rules.d/85-nm-unmanaged.rules
 
-# symlink connections
+# symlink connections dir
 rm -rf $ROOT/etc/NetworkManager/system-connections/
 mkdir -p $ROOT/etc/NetworkManager/
 ln -s /run/cowroot/root/data/nm-connections $ROOT/etc/NetworkManager/system-connections
 
+# config usb net
 cat > $ROOT/lib/systemd/system/config-usb-net.service << EOF
 [Unit]
 Description=Create USB Net Connections for NetworkManager
