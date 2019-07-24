@@ -19,7 +19,7 @@ TMP="$DATA/tmp"
 
 if [ -h $INIT ]; then exit 0; fi
 
-# do a favor
+# do a favor, TODO this breaks test
 btrfs filesystem resize max $ROOT
 
 { 
@@ -35,7 +35,17 @@ hash=$(echo -n "$USN" | sha256sum | cut -c 1-64)
 HOSTNAME="pan-${USN:0:4}"
 MACHINE_ID=${hash:0:32}
 
-mac5="${hash:32:2}:${hash:34:2}:${hash:36:2}:${hash:38:2}:${hash:40:2}"
+OUIIP="98:e8:fb:${USN:0:2}:${USN:2:2}"
+
+HOST_SUFFIX=${hash:32:2}
+
+if [ "$HOST_SUFFIX" == "ff" ]; then
+  DEV_SUFFIX="00"
+else
+  DEV_SUFFIX=$( printf "%02x" $(( 0x$HOST_SUFFIX + 1 )) )
+fi
+
+# mac5="${hash:32:2}:${hash:34:2}:${hash:36:2}:${hash:38:2}:${hash:40:2}"
 rm -rf $INIT
 rm -rf $INIT0
 rm -rf $TMP
@@ -49,9 +59,9 @@ echo "$MACHINE_ID" > $TMP/machine-id
 cat > $TMP/usb0.env << EOF
 SERIAL_NUMBER=$USN
 MANUFACTURER="Shanghai Dingnan Co., Ltd"
-PRODUCT="Smart Drive"
-HOST_ADDR="82:$mac5"
-DEV_ADDR="86:$mac5"
+PRODUCT="Net Drive"
+HOST_ADDR="$OUIIP:$HOST_SUFFIX"
+DEV_ADDR="$OUIIP:$DEV_SUFFIX"
 EOF
 
 mv $TMP $INIT0
