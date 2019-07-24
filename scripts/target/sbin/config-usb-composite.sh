@@ -25,7 +25,7 @@ echo "$PRODUCT" > strings/0x409/product
 
 mkdir -p functions/acm.usb0           # serial
 mkdir -p functions/rndis.usb0         # rndis
-mkdir -p functions/mass_storage.usb0  # mass_storage
+# mkdir -p functions/mass_storage.usb0  # mass_storage
 
 mkdir -p configs/c.1
 echo 250 > configs/c.1/MaxPower
@@ -35,15 +35,15 @@ echo $DEV_ADDR > functions/rndis.usb0/dev_addr
 echo RNDIS > functions/rndis.usb0/os_desc/interface.rndis/compatible_id
 echo 5162001 > functions/rndis.usb0/os_desc/interface.rndis/sub_compatible_id
 
-echo 1 > functions/mass_storage.usb0/lun.0/cdrom
-echo 1 > functions/mass_storage.usb0/lun.0/ro
+# echo 1 > functions/mass_storage.usb0/lun.0/cdrom
+# echo 1 > functions/mass_storage.usb0/lun.0/ro
 
 ln -s configs/c.1 os_desc
 ln -s functions/acm.usb0 configs/c.1/
 ln -s functions/rndis.usb0 configs/c.1/
-ln -s functions/mass_storage.usb0 configs/c.1/
+# ln -s functions/mass_storage.usb0 configs/c.1/
 
-sleep 2
+sleep 1
 
 ls /sys/class/udc/ > UDC
 
