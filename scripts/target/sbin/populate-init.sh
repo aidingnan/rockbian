@@ -7,17 +7,20 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
-#
-# DIR
-#   init -> init.0    # symlink
-#   init.0            # directory
-#
-DIR=$1
-INIT="$DIR/init"
-INIT0="$DIR/init.0"
-TMP="$DIR/tmp"
+# / <volume root>
+#   data/
+#     init -> init.0    # symlink
+#     init.0            # directory
+ROOT=$1
+DATA=$ROOT/data
+INIT="$DATA/init"
+INIT0="$DATA/init.0"
+TMP="$DATA/tmp"
 
-if [ -h $DIR/init ]; then exit 0; fi
+if [ -h $INIT ]; then exit 0; fi
+
+# do a favor
+btrfs filesystem resize max $ROOT
 
 { 
   SN=$(atecc -b 1 -c serial) 
@@ -37,7 +40,7 @@ rm -rf $INIT
 rm -rf $INIT0
 rm -rf $TMP
 
-mkdir $TMP
+mkdir -p $TMP
 
 echo "$SN" > $TMP/sn
 echo "$USN" > $TMP/usn
@@ -54,3 +57,4 @@ EOF
 mv $TMP $INIT0
 ln -s init.0 $INIT
 
+echo "$INIT populated"

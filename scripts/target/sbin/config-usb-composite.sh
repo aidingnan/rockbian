@@ -1,17 +1,9 @@
 #!/bin/bash
 
-# serial number from 
-# manufacturer
-# product
-# host addr
-# dev addr
+source "/run/cowroot/root/data/init/usb0.env"
 
-HOST_ADDR="48:6f:73:74:50:43" # "HostPC"
-DEV_ADDR="42:61:64:55:53:42" # "BadUSB"
-
-configdir=/sys/kernel/config/usb_gadget/1
-# usb_disk="/root/gen.iso"
-mkdir $configdir && cd $configdir
+DIR=/sys/kernel/config/usb_gadget/1
+mkdir $DIR && cd $DIR
 
 echo 0x1d6b > idVendor  # Linux Foundation
 echo 0x0104 > idProduct # Multifunction Composite Gadget
@@ -27,9 +19,9 @@ echo 0xcd > os_desc/b_vendor_code
 echo MSFT100 > os_desc/qw_sign
 
 mkdir -p strings/0x409
-echo "123456" > strings/0x409/serialnumber
-echo "Dingnan" > strings/0x409/manufacturer
-echo "pan" > strings/0x409/product
+echo "$SERIAL_NUMBER" > strings/0x409/serialnumber
+echo "$MANUFACTURER" > strings/0x409/manufacturer
+echo "$PRODUCT" > strings/0x409/product
 
 mkdir -p functions/acm.usb0           # serial
 mkdir -p functions/rndis.usb0         # rndis
@@ -45,13 +37,13 @@ echo 5162001 > functions/rndis.usb0/os_desc/interface.rndis/sub_compatible_id
 
 echo 1 > functions/mass_storage.usb0/lun.0/cdrom
 echo 1 > functions/mass_storage.usb0/lun.0/ro
-# echo $usb_disk > functions/mass_storage.usb0/lun.0/file
 
 ln -s configs/c.1 os_desc
-ln -s functions/rndis.usb0 configs/c.1/
 ln -s functions/acm.usb0 configs/c.1/
+ln -s functions/rndis.usb0 configs/c.1/
 ln -s functions/mass_storage.usb0 configs/c.1/
 
-sleep 1
+sleep 2
 
 ls /sys/class/udc/ > UDC
+

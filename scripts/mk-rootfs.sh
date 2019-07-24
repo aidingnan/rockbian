@@ -76,9 +76,13 @@ iface lo inet loopback
 #   netmask 255.255.0.0
 EOF
 
-# hostnamectl does not work in chroot
-# chroot $ROOT hostnamectl set-hostname "winas"
-echo "winas" > $ROOT/etc/hostname
+# symlink hostname
+rm -rf $ROOT/etc/hostname
+ln -s "/run/cowroot/root/data/init/hostname"
+
+# symlink machine-id
+rm -rf $ROOT/etc/machine-id
+ln -s "/run/cowroot/root/data/init/machine-id"
 
 # locale
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' $ROOT/etc/locale.gen
