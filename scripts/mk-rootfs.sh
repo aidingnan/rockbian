@@ -63,26 +63,18 @@ EOF
 cat > $ROOT/etc/network/interfaces << EOF
 # interfaces(5) file used by ifup(8) and ifdown(8)
 # Include files from /etc/network/interfaces.d:
-# auto eth0
-# allow-hotplug eth0
-# iface eth0 inet dhcp
 
 auto lo
 iface lo inet loopback
-
-# auto usb0
-# iface usb0 inet static
-#   address 169.254.10.10
-#   netmask 255.255.0.0
 EOF
 
 # symlink hostname
 rm -rf $ROOT/etc/hostname
-ln -s "/run/cowroot/root/data/init/hostname"
+ln -s "/run/cowroot/root/data/init/hostname" $ROOT/etc/hostname
 
 # symlink machine-id
 rm -rf $ROOT/etc/machine-id
-ln -s "/run/cowroot/root/data/init/machine-id"
+ln -s "/run/cowroot/root/data/init/machine-id" $ROOT/etc/machine-id
 
 # locale
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' $ROOT/etc/locale.gen

@@ -52,7 +52,7 @@ mkdir -p $ROOT_MNT $TMP_RW_ROOT
 echo "mount root volume @ $ROOT_MNT"
 mount -t btrfs UUID=$root_vol $ROOT_MNT 2>&1 1>/dev/null
 
-populate-init
+populate-init $ROOT_MNT
 
 [ -f $ROOT_MNT/boot/.debug_init ] && DEBUG=true
 
