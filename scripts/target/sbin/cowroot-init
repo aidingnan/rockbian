@@ -21,14 +21,14 @@ mount -t tmpfs tmpfs /tmp
 CMDLINE=$(cat /proc/cmdline)
 IFS=' ' read -ra cmd_array <<< "$CMDLINE"
 for i in "${cmd_array[@]}"; do
-  if [[ $i =~ root=UUID=${UUID_REGEX} ]]; then
+  if [[ $i =~ root=UUID=${UUID_REGEX}$ ]]; then
     root_vol=${i:10}
   elif [[ $i == rootflags=* ]]; then
     IFS=',' read -ra rootflag_array <<< "${i:10}"
     for j in "${rootflag_array[@]}"; do
-      if [[ $j =~ ^subvol=/vols/${UUID_REGEX} ]]; then
+      if [[ $j =~ ^subvol=/vols/${UUID_REGEX}$ ]]; then
         ro_root_subvol=${j:13}
-      elif [[ $j =~ ^subvol=vols/${UUID_REGEX} ]]; then
+      elif [[ $j =~ ^subvol=vols/${UUID_REGEX}$ ]]; then
         ro_root_subvol=${j:12}
       fi  
     done
@@ -37,9 +37,9 @@ for i in "${cmd_array[@]}"; do
     for k in "${loaderflag_array[@]}"; do
       if [[ $k == op=* ]]; then
         loader_op=${k:3}
-      elif [[ $k =~ ^l=${UUID_REGEX} ]]; then
+      elif [[ $k =~ ^l=${UUID_REGEX}$ ]]; then
         loader_l=${k:2}    
-      elif [[ $k =~ ^r=${UUID_REGEX} ]]; then
+      elif [[ $k =~ ^r=${UUID_REGEX}$ ]]; then
         loader_r=${k:2}
       fi  
     done
