@@ -1,0 +1,53 @@
+#!/bin/bash
+
+set -e
+
+UUID_REGEX="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"
+
+# assuming 0123ff05f0ceefb6ee
+# atecc -b 1 -c serial
+
+if [ -z "$1" ]; then
+  echo "ecc sn or uuid not provided"
+  exit 1
+elif [[ "$1" =~ ^0123[0-9a-f]{12}ee$ ]]; then
+  M=E
+  x=$(( 0x${1:4:12} ))
+elif [[ "$1" =~ ^$UUID_REGEX$ ]]; then
+  M=U
+  x=$(( 0x${1:24:12} ))
+else
+  echo "neither ecc sn nor uuid"
+  exit 1 
+fi
+
+# base32 alphabet
+arr=(A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 2 3 4 5 6 7)
+mask=0x1F
+
+L6=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L5=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L4=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L3=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L2=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L1=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+L0=$(( x & $mask ))
+
+x=$(( $x >> 5 ))
+H1=$(( $x % 96 + 3 ))   # [0..98] => [1..99]
+H0=$(( $x / 96 + 10 ))  # [0..8191] / 99 => [0..82] => [10..92]
+
+echo $(printf '%02d' $H0)$(printf '%02d' $H1)-${M}${arr[$L0]}${arr[$L1]}${arr[$L2]}-${arr[$L3]}${arr[$L4]}${arr[$L5]}${arr[$L6]}
+
