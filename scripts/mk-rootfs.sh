@@ -129,9 +129,29 @@ wifi.powersave=2
 wifi.scan-rand-mac-address=no
 EOF
 
+# let nm manage usb net
+sed 's/^ENV{DEVTYPE}=="gadget"/# ENV{DEVTYPE}=="gadget"/' $ROOT/lib/udev/rules.d/85-nm-unmanaged.rules
+
+# symlink connections
 rm -rf $ROOT/etc/NetworkManager/system-connections/
 mkdir -p $ROOT/etc/NetworkManager/
 ln -s /run/cowroot/root/data/nm-connections $ROOT/etc/NetworkManager/system-connections
+
+cat > $ROOT/lib/systemd/system/config-usb-net.service << EOF
+[Unit]
+Description=Create USB Net Connections for NetworkManager
+Wants=network.target
+Before=NetworkManager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/sbin/config-usb-net.sh
+
+[Install]
+WantedBy=network.target
+EOF
+chroot $ROOT systemctl enable config-usb-net.service
 
 # config zram
 if [ -f $ROOT/etc/default/zramswap.conf ]; then
