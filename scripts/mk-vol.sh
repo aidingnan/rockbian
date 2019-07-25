@@ -38,7 +38,7 @@ mkdir -p $MNT/refs/tags
 mkdir -p $MNT/data/nm-connections # not neccessarily
 
 # boot from testing in rooted mode
-touch $MNT/boot/.root
+# touch $MNT/boot/.root
 
 echo "generating system.env, boot from testing subvol"
 cat > $MNT/boot/system.env << EOF
