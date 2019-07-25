@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# <vol root>
+#   data/
+#     root -> root.0
+#     root.0/
+#       engineering
+
+# root: create empty root.0 dir and root symlink
+# unroot: remove root symlink first, then root.0 dir
+
+set -e
+
+if [ -z $ROOT_MNT ]; then
+  ROOT_MNT=/run/cowroot/root/
+fi
+
+DATA_DIR=$ROOT_MNT/data
+ROOT_LINK=$DATA_DIR/root
+ROOT_0=$DATA_DIR/root.0
+
+case "$1" in
+  root )
+    if [ -h $ROOT_LINK ]; then exit; fi
+    rm -rf $ROOT_LINK $ROOT_0
+    mkdir -p $ROOT_0
+    ln -s root.0 $ROOT_LINK 
+  ;;
+  unroot )
+    rm -rf $ROOT_LINK $ROOT_0
+  ;;
+  is-rooted )
+    if [ -h $ROOT_LINK ]; then
+      echo "true"
+    else
+      echo "false"
+    fi
+  ;;
+esac
