@@ -207,6 +207,7 @@ cat > $ROOT/lib/systemd/system/winasd.service << EOF
 Description=Winas Daemon Service
 Requires=network.target
 After=network.target
+ConditionPathExists=!/run/cowroot/root/data/root/engineering
 
 [Service]
 Type=simple
