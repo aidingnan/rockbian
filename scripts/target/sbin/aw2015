@@ -1,0 +1,58 @@
+#!/bin/bash
+
+set -e
+
+GET="i2cget -y 1 0x64"
+SET="i2cset -y 1 0x64"
+
+function rotate {
+  for i in 1 2 3 4 5 6 7 8 9 10; do
+    if [[ "$1" = "$i" ]]; then
+      TIMES=$1
+      break
+    fi
+  done
+  if [ ! $TIMES ]; then TIMES=3; fi
+
+  echo "rotate $TIMES times"
+
+  regs=()
+  for i in 10 11 12 1C 1D 1E 04 05 06 07; do
+    num=$(( 0x$i ))
+    regs[$num]="$($GET 0x$i)"
+  done
+
+  $SET 0x07 0x00        # disable
+  $SET 0x04 0x00        # manual mode
+  $SET 0x05 0x00
+  $SET 0x06 0x00
+  $SET 0x10 0xFF        # max current
+  $SET 0x11 0xFF
+  $SET 0x12 0xFF
+  $SET 0x1C 0x50        # duty, not too bright
+  $SET 0x1D 0x80
+  $SET 0x1E 0x60
+
+  for ((i=0;i<${TIMES};i++)); do
+    $SET 0x07 0x01; sleep 0.3; $SET 0x07 0x00; sleep 0.1
+    $SET 0x07 0x02; sleep 0.3; $SET 0x07 0x00; sleep 0.1
+    $SET 0x07 0x04; sleep 0.3; $SET 0x07 0x00; sleep 0.1
+  done
+
+  for i in 10 11 12 1C 1D 1E 04 05 06 07; do
+    num=$(( 0x$i ))
+    $SET 0x$i ${regs[$num]}
+  done
+}
+
+case $1 in
+  rotate )
+    rotate $2
+    ;;
+  * )
+    echo "usage:"
+    echo "  rotate n # rotate 1/2/3 n times, n ranges over [1..10]"
+    ;;
+esac
+
+
