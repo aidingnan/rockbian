@@ -39,7 +39,7 @@ cp -r firmware/* $ROOT/lib/firmware
 # permit root login if ssh server installed
 if [ -f $ROOT/etc/ssh/sshd_config ]; then
   sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
-  sed -i 'ConditionPathExists=.*/ConditionPathExists=/run/cowroot/root/data/root'
+  sed -i '/ConditionPathExists=.*/c\ConditionPathExists=/run/cowroot/root/data/root' $ROOT/lib/systemd/system/ssh.service
 fi
 
 # add ttyGS0 to secure tty
