@@ -2,6 +2,12 @@
 
 set -e
 
+if [ "$(git diff-index HEAD --)" ]; then
+  echo "git repo not clean"
+  git diff-index HEAD --
+  exit 1
+fi
+
 SCRIPT_DIR=$(dirname "$0")
 SCRIPT_NAME=$(basename "$0")
 ECHO="echo $SCRIPT_NAME:"
@@ -235,6 +241,19 @@ ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.tar
 
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
+
+$ECHO "saving commit and tag if any"
+COMMIT="$(git rev-parse HEAD)"
+echo "$COMMIT" > $ROOT/boot/.commit
+
+{
+  TAG="$(git describe --exact-match $COMMIT)"
+} || {
+  TAG=
+}
+if [ "$TAG" ]; then
+  echo "$TAG" > $ROOT/boot/.tag
+fi
 
 tar cf $TMP/$ROOTFS_TAR --zstd -C $ROOT .
 mv $TMP/$ROOTFS_TAR $CACHE/$ROOTFS_TAR

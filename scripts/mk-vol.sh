@@ -2,6 +2,12 @@
 
 set -e
 
+if [ "$(git diff-index HEAD --)" ]; then
+  echo "git repo not clean"
+  git diff-index HEAD --
+  exit 1
+fi
+
 SCRIPT_DIR=$(dirname "$0")
 SCRIPT_NAME=$(basename "$0")
 ECHO="echo $SCRIPT_NAME:"
@@ -70,6 +76,19 @@ echo "save subvol tags"
 echo "$initial_subvol" > $MNT/refs/tags/initial
 echo "$working_subvol" > $MNT/refs/tags/working
 echo "$staging_subvol" > $MNT/refs/tags/staging
+
+$ECHO "saving commit and tag if any"
+COMMIT="$(git rev-parse HEAD)"
+echo "$COMMIT" > $ROOT/boot/.commit
+
+{
+  TAG="$(git describe --exact-match $COMMIT)"
+} || {
+  TAG=
+}
+if [ "$TAG" ]; then
+  echo "$TAG" > $ROOT/boot/.tag
+fi
 
 sync
 umount $MNT
