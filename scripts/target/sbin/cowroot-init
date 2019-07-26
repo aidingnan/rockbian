@@ -50,7 +50,7 @@ TMP_RW_ROOT=/tmp/rw-root
 mkdir -p $ROOT_MNT $TMP_RW_ROOT
 
 echo "mount root volume @ $ROOT_MNT"
-mount -t btrfs UUID=$root_vol $ROOT_MNT 2>&1 1>/dev/null
+mount -t btrfs -o commit=3 UUID=$root_vol $ROOT_MNT 2>&1 1>/dev/null
 
 populate-init $ROOT_MNT
 
@@ -101,7 +101,7 @@ btrfs subvolume snapshot / $RW_SUBVOL 2>&1 1>/dev/null
 mkdir -p $RW_SUBVOL/boot
 echo $ro_root_subvol > $RW_SUBVOL/boot/.parent
 
-mount -t btrfs -o subvol=vols/$rw_subvol UUID=$root_vol $TMP_RW_ROOT
+mount -t btrfs -o subvol=vols/$rw_subvol,commit=3 UUID=$root_vol $TMP_RW_ROOT
 
 echo "pivot_root to rw volume"
 cd $TMP_RW_ROOT
