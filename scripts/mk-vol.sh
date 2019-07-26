@@ -82,7 +82,7 @@ COMMIT="$(git rev-parse HEAD)"
 echo "$COMMIT" > $ROOT/boot/.commit
 
 {
-  TAG="$(git describe --exact-match $COMMIT)"
+  TAG="$(git describe --exact-match --tag $COMMIT)"
 } || {
   TAG=
 }
