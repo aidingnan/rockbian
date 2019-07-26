@@ -139,21 +139,21 @@ mkdir -p $ROOT/etc/NetworkManager/
 ln -s /run/cowroot/root/data/nm-connections $ROOT/etc/NetworkManager/system-connections
 
 # config usb net
-cat > $ROOT/lib/systemd/system/config-usb-net.service << EOF
+cat > $ROOT/lib/systemd/system/preconfig-network-manager.service << EOF
 [Unit]
-Description=Create USB Net Connections for NetworkManager
+Description=Preconfig NetworkManager
 Wants=network.target
 Before=NetworkManager.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/sbin/config-usb-net.sh
+ExecStart=/sbin/preconfig-network-manager.sh
 
 [Install]
 WantedBy=network.target
 EOF
-chroot $ROOT systemctl enable config-usb-net.service
+chroot $ROOT systemctl enable preconfig-network-manager.service
 
 # config zram
 if [ -f $ROOT/etc/default/zramswap.conf ]; then
