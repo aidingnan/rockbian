@@ -183,7 +183,7 @@ chroot $ROOT systemctl enable config-usb-gadget.service
 # overriding serial-getty@ttyGS0
 mkdir -p $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/
 cat > $ROOT/etc/systemd/system/serial-getty@ttyGS0.service.d/override.conf << EOF
-ConditionPathExists=/run/cowroot/root/boot/.root
+ConditionPathExists=/run/cowroot/root/data/root
 EOF
 chroot $ROOT systemctl enable serial-getty@ttyGS0.service
 
