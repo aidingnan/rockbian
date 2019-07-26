@@ -65,6 +65,7 @@ DEV_ADDR="$OUIIP:$DEV_SUFFIX"
 EOF
 
 mv $TMP $INIT0
+sync
 ln -s init.0 $INIT
-
+sync
 echo "$INIT populated"
