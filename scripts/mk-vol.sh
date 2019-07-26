@@ -35,10 +35,11 @@ mount -o loop $IMG $MNT
 mkdir -p $MNT/boot
 mkdir -p $MNT/vols
 mkdir -p $MNT/refs/tags
-mkdir -p $MNT/data/nm-connections # not neccessarily
 
-# boot from testing in rooted mode
-# touch $MNT/boot/.root
+# set engineering mode
+mkdir -p $MNT/data/root.0
+touch $MNT/data/root.0/engineering
+ln -s root.0 $MNT/data/root
 
 echo "generating system.env, boot from testing subvol"
 cat > $MNT/boot/system.env << EOF
