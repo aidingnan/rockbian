@@ -89,7 +89,7 @@ fi
 
 ROOTVOL="e383f6f7-6572-46a9-a7fa-2e0633015231"
 ROOT="root=UUID=${ROOTVOL}" 
-ROOTFLAGS="rootflags=subvol=/vols/${loader_r},commit=2 ro rootwait rootfstype=btrfs"
+ROOTFLAGS="rootflags=subvol=/vols/${loader_r} ro rootwait rootfstype=btrfs"
 CONSOLE="console=tty0 console=ttyS2,1500000"
 LOG="loglevel=0"
 COWROOTFLAGS="cowrootflags=l=${loader_l},r=${loader_r},op=${loader_op}"
