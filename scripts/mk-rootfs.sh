@@ -206,6 +206,11 @@ ExecStop=/sbin/cowroot-commit
 [Install]
 WantedBy=multi-user.target
 EOF
+chroot $ROOT systemctl enable cowroot-auto-commit.service
+
+# disable apt services
+chroot $ROOT systemctl mask apt-daily-upgrade.timer
+chroot $ROOT systemctl mask apt-daily.timer
 
 # enable systemd-resolvd
 chroot $ROOT systemctl enable systemd-resolved
