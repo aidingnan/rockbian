@@ -148,7 +148,7 @@ ln -s /run/cowroot/root/data/nm-connections $ROOT/etc/NetworkManager/system-conn
 cat > $ROOT/lib/systemd/system/preconfig-network-manager.service << EOF
 [Unit]
 Description=Preconfig NetworkManager
-Wants=network.target
+# Wants=network.target
 Before=NetworkManager.service
 
 [Service]
@@ -157,7 +157,7 @@ RemainAfterExit=yes
 ExecStart=/sbin/preconfig-network-manager.sh
 
 [Install]
-WantedBy=network.target
+WantedBy=multi-user.target
 EOF
 chroot $ROOT systemctl enable preconfig-network-manager.service
 
@@ -175,7 +175,7 @@ cat > $ROOT/lib/systemd/system/config-usb-gadget.service << EOF
 [Unit]
 Description=Config USB Gadget
 ConditionPathIsDirectory=/sys/kernel/config/usb_gadget
-Before=network.target
+# Before=network.target
 
 [Service]
 Type=oneshot
@@ -183,7 +183,7 @@ RemainAfterExit=yes
 ExecStart=/sbin/config-usb-composite.sh
 
 [Install]
-WantedBy=network.target
+WantedBy=multi-user.target
 EOF
 chroot $ROOT systemctl enable config-usb-gadget.service
 
