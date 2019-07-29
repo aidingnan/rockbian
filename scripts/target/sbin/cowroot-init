@@ -17,12 +17,15 @@ export PATH=/sbin:/usr/sbin:/bin:/usr/bin
 mountpoint /sys || mount -t sysfs -o nodev,noexec,nosuid,relatime sysfs /sys
 mountpoint /proc || mount -t proc -o nodev,noexec,nosuid,relatime proc /proc
 mountpoint /dev || mount -t devtmpfs -o nosuid,relatime,mode=0755 udev /dev
+mkdir -p /dev/pts
 mountpoint /dev/pts || mount -t devpts -o noexec,nosuid,relatime,gid=5,mode=0620 devpts /dev/pts || true
 
-source cowroot-env
+mountpoint /run || mount -t tmpfs -o nosuid,noexec,relatime,mode=0755
 
 # without /tmp rw, heredoc does not work
 mount -t tmpfs tmpfs /tmp
+
+source cowroot-env
 
 CMDLINE=$(cat /proc/cmdline)
 IFS=' ' read -ra cmd_array <<< "$CMDLINE"
