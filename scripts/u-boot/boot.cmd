@@ -88,7 +88,8 @@ if test "${loader_env_dirty}" = "true"; then
 fi
 
 ROOTVOL="e383f6f7-6572-46a9-a7fa-2e0633015231"
-ROOT="root=UUID=${ROOTVOL}" 
+# ROOT="root=UUID=${ROOTVOL}"
+ROOT="root=/dev/mmcblk1p1"
 ROOTFLAGS="rootflags=subvol=/vols/${loader_r} ro rootwait rootfstype=btrfs"
 CONSOLE="console=tty0 console=ttyS2,1500000"
 LOG="loglevel=0"
