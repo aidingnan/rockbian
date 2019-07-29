@@ -265,6 +265,9 @@ ln -s /lib/systemd/system/winasd.service $ROOT/etc/systemd/system/multi-user.tar
 $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
+$ECHO "remove initrd"
+rm $ROOT/boot/uInitrd
+
 $ECHO "saving commit and tag if any"
 COMMIT="$(git rev-parse HEAD)"
 echo "$COMMIT" > $ROOT/boot/.commit
