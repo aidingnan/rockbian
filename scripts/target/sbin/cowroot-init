@@ -19,8 +19,7 @@ mountpoint /proc || mount -t proc -o nodev,noexec,nosuid,relatime proc /proc
 mountpoint /dev || mount -t devtmpfs -o nosuid,relatime,mode=0755 udev /dev
 mkdir -p /dev/pts
 mountpoint /dev/pts || mount -t devpts -o noexec,nosuid,relatime,gid=5,mode=0620 devpts /dev/pts || true
-
-mountpoint /run || mount -t tmpfs -o nosuid,noexec,relatime,mode=0755
+mountpoint /run || mount -t tmpfs -o nosuid,noexec,relatime,mode=0755 tmpfs /run
 
 # without /tmp rw, heredoc does not work
 mount -t tmpfs tmpfs /tmp
