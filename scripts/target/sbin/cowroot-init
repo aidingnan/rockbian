@@ -100,6 +100,12 @@ echo "snapshot ro volume $ro_root_subvol to rw volume"
 btrfs subvolume snapshot / $RW_SUBVOL 2>&1 1>/dev/null
 mkdir -p $RW_SUBVOL/boot
 echo $ro_root_subvol > $RW_SUBVOL/boot/.parent
+if [ -f /boot/.ancestor ]; then
+  cat /boot/.ancestor > $RW_SUBVOL/boot/.ancestor
+else
+  echo $ro_root_subvol > $RW_SUBVOL/boot/.ancestor
+fi
+sync
 
 mount -t btrfs -o subvol=vols/$rw_subvol,commit=3 UUID=$root_vol $TMP_RW_ROOT
 
