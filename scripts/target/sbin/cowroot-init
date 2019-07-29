@@ -23,7 +23,7 @@ IFS=' ' read -ra cmd_array <<< "$CMDLINE"
 for i in "${cmd_array[@]}"; do
   if [[ $i =~ root=UUID=${UUID_REGEX}$ ]]; then
     root_vol=${i:10}
-  elif [[ $i =~ root=* ]]; then
+  elif [[ $i == root=* ]]; then
     root_dev=${i:5}
   elif [[ $i == rootflags=* ]]; then
     IFS=',' read -ra rootflag_array <<< "${i:10}"
