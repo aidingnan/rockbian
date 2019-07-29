@@ -39,6 +39,11 @@ cp $CACHE/$ATECC_BIN $ROOT/sbin
 chmod a+x $ROOT/sbin/$ATECC_BIN
 cp scripts/target/sbin/* $ROOT/sbin
 
+mkdir -p $ROOT/root/.ssh
+chmod 700 $ROOT/root/.ssh
+cat keys/id_rsa.pub >> $ROOT/root/.ssh/authorized_keys
+chmod 600 $ROOT/root/.ssh/authorized_keys
+
 mkdir -p $ROOT/lib/firmware
 cp -r firmware/* $ROOT/lib/firmware
 
