@@ -87,12 +87,12 @@ if test "${loader_env_dirty}" = "true"; then
   echo "loader env saved to mmc block ${cow_loader_mmc_block}"
 fi
 
-ROOTVOL="e383f6f7-6572-46a9-a7fa-2e0633015231"
+# ROOTVOL="e383f6f7-6572-46a9-a7fa-2e0633015231"
 # ROOT="root=UUID=${ROOTVOL}"
 ROOT="root=/dev/mmcblk1p1"
 ROOTFLAGS="rootflags=subvol=/vols/${loader_r} ro rootwait rootfstype=btrfs"
 CONSOLE="console=tty0 console=ttyS2,1500000"
-LOG="loglevel=0"
+LOG="quiet loglevel=3"
 COWROOTFLAGS="cowrootflags=l=${loader_l},r=${loader_r},op=${loader_op}"
 INIT="init=/sbin/cowroot-init"
 
@@ -107,12 +107,16 @@ setenv bootargs "${ROOT} ${ROOTFLAGS} ${CONSOLE} ${LOG} ${COWROOTFLAGS} ${INIT}"
 
 SUBVOL_BOOT="/vols/${loader_r}/boot"
 
-load ${devtype} ${devnum}:${partnum} ${ramdisk_addr_r} ${SUBVOL_BOOT}/uInitrd
 load ${devtype} ${devnum}:${partnum} ${kernel_addr_r} ${SUBVOL_BOOT}/Image
 load ${devtype} ${devnum}:${partnum} ${fdt_addr_r} ${SUBVOL_BOOT}/dtbs/rockchip/rk3328-backus.dtb
 fdt addr ${fdt_addr_r}
 fdt resize 65536
-booti ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+
+if load ${devtype} ${devnum}:${partnum} ${ramdisk_addr_r} ${SUBVOL_BOOT}/uInitrd; then
+  booti ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
+else
+  booti ${kernel_addr_r} - ${fdt_addr_r}
+fi
 
 # Recompile with:
 # mkimage -C none -A arm -T script -d boot.cmd boot.scr
