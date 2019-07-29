@@ -10,8 +10,14 @@ function printenv () {
 }
 
 echo ""
-echo "COWROOT Hijacker"
+echo "COWROOT init"
 echo ""
+
+export PATH=/sbin:/usr/sbin:/bin:/usr/bin
+mountpoint /sys || mount -t sysfs -o nodev,noexec,nosuid,relatime sysfs /sys
+mountpoint /proc || mount -t proc -o nodev,noexec,nosuid,relatime proc /proc
+mountpoint /dev || mount -t devtmpfs -o nosuid,relatime,mode=0755 udev /dev
+mountpoint /dev/pts || mount -t devpts -o noexec,nosuid,relatime,gid=5,mode=0620 devpts /dev/pts || true
 
 source cowroot-env
 
