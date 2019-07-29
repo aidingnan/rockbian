@@ -23,6 +23,8 @@ IFS=' ' read -ra cmd_array <<< "$CMDLINE"
 for i in "${cmd_array[@]}"; do
   if [[ $i =~ root=UUID=${UUID_REGEX}$ ]]; then
     root_vol=${i:10}
+  elif [[ $i =~ root=* ]]; then
+    root_dev=${i:5}
   elif [[ $i == rootflags=* ]]; then
     IFS=',' read -ra rootflag_array <<< "${i:10}"
     for j in "${rootflag_array[@]}"; do
@@ -46,11 +48,17 @@ for i in "${cmd_array[@]}"; do
   fi  
 done
 
+if [ $root_vol ]; then
+  ROOT_DEV="UUID=$root_vol"
+else
+  ROOT_DEV=$root_dev
+fi
+
 TMP_RW_ROOT=/tmp/rw-root
 mkdir -p $ROOT_MNT $TMP_RW_ROOT
 
 echo "mount root volume @ $ROOT_MNT"
-mount -t btrfs -o commit=3 UUID=$root_vol $ROOT_MNT 2>&1 1>/dev/null
+mount -t btrfs -o commit=3 $ROOT_DEV $ROOT_MNT 2>&1 1>/dev/null
 
 populate-init $ROOT_MNT
 
@@ -59,6 +67,7 @@ populate-init $ROOT_MNT
 source $SYSTEM_ENV
 cat > $RUNTIME_ENV << EOF
 root_vol=$root_vol
+root_dev=$root_dev
 ro_root_subvol=$ro_root_subvol
 _system_l=$system_l
 _system_l_opts=$system_l_opts
@@ -107,7 +116,7 @@ else
 fi
 sync
 
-mount -t btrfs -o subvol=vols/$rw_subvol,commit=3 UUID=$root_vol $TMP_RW_ROOT
+mount -t btrfs -o subvol=vols/$rw_subvol,commit=3 $ROOT_DEV $TMP_RW_ROOT
 
 echo "pivot_root to rw volume"
 cd $TMP_RW_ROOT
