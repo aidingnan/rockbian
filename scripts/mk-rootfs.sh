@@ -194,6 +194,19 @@ ConditionPathExists=/run/cowroot/root/data/root
 EOF
 chroot $ROOT systemctl enable serial-getty@ttyGS0.service
 
+cat > $ROOT/lib/systemd/system/cowroot-auto-commit.service << EOF
+[Unit]
+Description=Cowroot Auto Commit
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStop=/sbin/cowroot-commit
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 # enable systemd-resolvd
 chroot $ROOT systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
