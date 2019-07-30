@@ -79,7 +79,7 @@ echo "$staging_subvol" > $MNT/refs/tags/staging
 
 $ECHO "saving commit and tag if any"
 COMMIT="$(git rev-parse HEAD)"
-echo "$COMMIT" > $ROOT/boot/.commit
+echo "$COMMIT" > $MNT/boot/.commit
 
 {
   TAG="$(git describe --exact-match --tag $COMMIT)"
@@ -87,7 +87,7 @@ echo "$COMMIT" > $ROOT/boot/.commit
   TAG=
 }
 if [ "$TAG" ]; then
-  echo "$TAG" > $ROOT/boot/.tag
+  echo "$TAG" > $MNT/boot/.tag
 fi
 
 sync
