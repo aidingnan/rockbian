@@ -180,11 +180,11 @@ cat > $ROOT/lib/systemd/system/config-usb-gadget.service << EOF
 [Unit]
 Description=Config USB Gadget
 ConditionPathIsDirectory=/sys/kernel/config/usb_gadget
-# Before=network.target
+After=sys-kernel-config.mount
 
 [Service]
-Type=oneshot
-RemainAfterExit=yes
+Type=simple
+Restart=no
 ExecStart=/sbin/config-usb-composite.sh
 
 [Install]
