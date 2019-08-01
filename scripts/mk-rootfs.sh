@@ -214,33 +214,33 @@ if [ -f $ROOT/etc/ssh/sshd_config ]; then
   sed -i '/ConditionPathExists=.*/c\ConditionPathExists=/run/cowroot/root/data/root' $ROOT/lib/systemd/system/ssh.service
 fi
 
-cat >> $ROOT/lib/systemd/system/preconfigure-ssh.service << EOF
+cat >> $ROOT/lib/systemd/system/preconfig-ssh.service << EOF
 [Unit]
 Description=Preconfigure SSH
 Before=ssh.service
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/preconfigure-ssh.sh
+ExecStart=/sbin/preconfig-ssh.sh
 
 [Install]
 WantedBy=multi-user.target
 EOF
-chroot $ROOT systemctl enable preconfigure-ssh.service
+chroot $ROOT systemctl enable preconfig-ssh.service
 
-cat >> $ROOT/lib/systemd/system/preconfigure-bluetooth.service << EOF
+cat >> $ROOT/lib/systemd/system/preconfig-bluetooth.service << EOF
 [Unit]
 Description=Preconfigure Bluetooth
 Before=bluetooth.service
 
 [Service]
 Type=oneshot
-ExecStart=/sbin/preconfigure-bluetooth.sh
+ExecStart=/sbin/preconfig-bluetooth.sh
 
 [Install]
 WantedBy=bluetooth.target
 EOF
-chroot $ROOT systemctl enable preconfigure-bluetooth.service
+chroot $ROOT systemctl enable preconfig-bluetooth.service
 
 # disable apt services
 chroot $ROOT systemctl mask apt-daily-upgrade.timer
