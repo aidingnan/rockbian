@@ -47,6 +47,10 @@ mkdir -p $MNT/data/root.0
 touch $MNT/data/root.0/engineering
 ln -s root.0 $MNT/data/root
 
+# copy predefined ssh keys
+mkdir -p $MNT/data/ssh/keys
+cp keys/* $MNT/data/ssh/keys
+
 echo "generating system.env, boot from testing subvol"
 cat > $MNT/boot/system.env << EOF
 system_l=$initial_subvol

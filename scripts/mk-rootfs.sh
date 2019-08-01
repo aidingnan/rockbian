@@ -39,19 +39,15 @@ cp $CACHE/$ATECC_BIN $ROOT/sbin
 chmod a+x $ROOT/sbin/$ATECC_BIN
 cp scripts/target/sbin/* $ROOT/sbin
 
-mkdir -p $ROOT/root/.ssh
-chmod 700 $ROOT/root/.ssh
-cat keys/id_rsa.pub >> $ROOT/root/.ssh/authorized_keys
-chmod 600 $ROOT/root/.ssh/authorized_keys
-
+# useless
 mkdir -p $ROOT/lib/firmware
 cp -r firmware/* $ROOT/lib/firmware
 
-# permit root login if ssh server installed
-if [ -f $ROOT/etc/ssh/sshd_config ]; then
-  sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
-  sed -i '/ConditionPathExists=.*/c\ConditionPathExists=/run/cowroot/root/data/root' $ROOT/lib/systemd/system/ssh.service
-fi
+# mkdir -p $ROOT/root/.ssh
+# chmod 700 $ROOT/root/.ssh
+# cat keys/id_rsa.pub >> $ROOT/root/.ssh/authorized_keys
+# chmod 600 $ROOT/root/.ssh/authorized_keys
+
 
 # add ttyGS0 to secure tty
 cat >> $ROOT/etc/securetty << EOF
@@ -205,13 +201,46 @@ Description=Cowroot Auto Commit
 
 [Service]
 Type=oneshot
-RemainAfterExit=true
 ExecStop=/sbin/cowroot-commit
 
 [Install]
 WantedBy=multi-user.target
 EOF
 chroot $ROOT systemctl enable cowroot-auto-commit.service
+
+# permit root login if ssh server installed
+if [ -f $ROOT/etc/ssh/sshd_config ]; then
+  sed -i '/PermitRootLogin/c\PermitRootLogin yes' $ROOT/etc/ssh/sshd_config
+  sed -i '/ConditionPathExists=.*/c\ConditionPathExists=/run/cowroot/root/data/root' $ROOT/lib/systemd/system/ssh.service
+fi
+
+cat >> $ROOT/lib/systemd/system/preconfigure-ssh.service << EOF
+[Unit]
+Description=Preconfigure SSH
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/preconfigure-ssh.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+chroot $ROOT systemctl enable preconfigure-ssh.service
+
+cat >> $ROOT/lib/systemd/system/preconfigure-bluetooth.service << EOF
+[Unit]
+Description=Preconfigure Bluetooth
+Before=bluetooth.service
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/preconfigure-bluetooth.sh
+
+[Install]
+WantedBy=bluetooth.target
+EOF
+chroot $ROOT systemctl enable preconfigure-bluetooth.service
 
 # disable apt services
 chroot $ROOT systemctl mask apt-daily-upgrade.timer
