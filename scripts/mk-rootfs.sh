@@ -48,7 +48,6 @@ cp -r firmware/* $ROOT/lib/firmware
 # cat keys/id_rsa.pub >> $ROOT/root/.ssh/authorized_keys
 # chmod 600 $ROOT/root/.ssh/authorized_keys
 
-
 # add ttyGS0 to secure tty
 cat >> $ROOT/etc/securetty << EOF
 
@@ -56,16 +55,16 @@ cat >> $ROOT/etc/securetty << EOF
 ttyGS0
 EOF
 
-# set up hosts
-cat > $ROOT/etc/hosts << EOF
-127.0.0.1 localhost
-127.0.1.1 winas
-
-# The following lines are desirable for IPv6 capable hosts
-::1     localhost ip6-localhost ip6-loopback
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-EOF
+# # set up hosts
+# cat > $ROOT/etc/hosts << EOF
+# 127.0.0.1 localhost
+# 127.0.1.1 winas
+#
+# # The following lines are desirable for IPv6 capable hosts
+# ::1     localhost ip6-localhost ip6-loopback
+# ff02::1 ip6-allnodes
+# ff02::2 ip6-allrouters
+# EOF
 
 # set up network interfaces
 cat > $ROOT/etc/network/interfaces << EOF
@@ -75,6 +74,10 @@ cat > $ROOT/etc/network/interfaces << EOF
 auto lo
 iface lo inet loopback
 EOF
+
+# symlink hosts
+rm -rf $ROOT/etc/hosts
+ln -s "/run/cowroot/root/data/init/hosts" $ROOT/etc/hosts
 
 # symlink hostname
 rm -rf $ROOT/etc/hostname
