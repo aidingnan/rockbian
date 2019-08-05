@@ -235,6 +235,7 @@ cat >> $ROOT/lib/systemd/system/preconfig-bluetooth.service << EOF
 [Unit]
 Description=Preconfigure Bluetooth
 Before=bluetooth.service
+After=sys-kernel-debug.mount
 
 [Service]
 Type=oneshot
