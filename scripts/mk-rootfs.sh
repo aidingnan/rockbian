@@ -255,7 +255,7 @@ chroot $ROOT systemctl enable systemd-resolved
 ln -sf /run/systemd/resolve/resolv.conf $ROOT/etc/resolv.conf
 
 # install node
-tar xf cache/node-v10.16.0-linux-arm64.tar.xz -C $ROOT/usr --strip-components=1
+tar xf $CACHE/$NODE_TAR -C $ROOT/usr --strip-components=1
 
 # install winas
 mkdir -p $ROOT/root/winas
