@@ -95,6 +95,7 @@ CONSOLE="console=tty0 console=ttyS2,1500000"
 LOG="quiet loglevel=3"
 COWROOTFLAGS="cowrootflags=l=${loader_l},r=${loader_r},op=${loader_op}"
 INIT="init=/sbin/cowroot-init"
+USB="usb-storage.quirks=0x152d:0x0578:u"
 
 echo ${ROOT}
 echo ${ROOTFLAGS}
@@ -102,8 +103,9 @@ echo ${CONSOLE}
 echo ${LOG}
 echo ${COWROOTFLAGS}
 echo ${INIT}
+echo ${USB}
 
-setenv bootargs "${ROOT} ${ROOTFLAGS} ${CONSOLE} ${LOG} ${COWROOTFLAGS} ${INIT}"
+setenv bootargs "${ROOT} ${ROOTFLAGS} ${CONSOLE} ${LOG} ${COWROOTFLAGS} ${INIT} ${USB}"
 
 SUBVOL_BOOT="/vols/${loader_r}/boot"
 
