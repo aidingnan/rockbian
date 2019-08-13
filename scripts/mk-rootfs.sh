@@ -277,7 +277,6 @@ Type=simple
 ExecStart=/usr/bin/node ./src/app.js
 WorkingDirectory=/root/winasd
 Restart=always
-Environment=NODE_ENV=testBackus
 
 LimitNOFILE=infinity
 LimitCORE=infinity
