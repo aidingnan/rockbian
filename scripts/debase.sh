@@ -26,7 +26,7 @@ DIR=$TMP/debase
 # isc-dhcp-client,isc-dhcp-server,ifupdown,
 INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,haveged,zstd,uuid,
 INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,rfkill,
-INCS+=nano,curl,wget,file,unzip,iputils-ping,ethtool,bluez-hcidump,
+INCS+=nano,curl,wget,file,unzip,iputils-ping,ethtool,bluez-hcidump,usbutils,
 INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
 INCS+=openssh-server,
