@@ -298,7 +298,7 @@ $ECHO "installing kernel"
 scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 
 $ECHO "remove initrd"
-rm $ROOT/boot/uInitrd
+mv $ROOT/boot/uInitrd $ROOT/boot/uInitrd-unused
 
 COMMIT="$(git rev-parse HEAD)"
 $ECHO "saving commit $COMMIT to /boot/.commit"
