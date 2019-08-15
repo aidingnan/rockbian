@@ -300,8 +300,8 @@ scripts/install-kernel.sh $ROOT $CACHE/$KERNEL_DEB
 $ECHO "remove initrd"
 rm $ROOT/boot/uInitrd
 
-$ECHO "saving commit and tag if any"
 COMMIT="$(git rev-parse HEAD)"
+$ECHO "saving commit $COMMIT to /boot/.commit"
 echo "$COMMIT" > $ROOT/boot/.commit
 
 {
@@ -310,7 +310,8 @@ echo "$COMMIT" > $ROOT/boot/.commit
   TAG=
 }
 if [ "$TAG" ]; then
-  echo "$TAG" > $ROOT/boot/.tag
+  $ECHO "saving tag $TAG to /etc/version"
+  echo "$TAG" > $ROOT/etc/version
 fi
 
 tar cf $TMP/$ROOTFS_TAR --zstd -C $ROOT .
