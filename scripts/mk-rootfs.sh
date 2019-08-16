@@ -310,7 +310,8 @@ echo "$COMMIT" > $ROOT/boot/.commit
   TAG=
 }
 if [ "$TAG" ]; then
-  $ECHO "saving tag $TAG to /etc/version"
+  $ECHO "saving tag $TAG to both /boot/.tag and /etc/version"
+  echo "$TAG" > $ROOT/boot/.tag
   echo "$TAG" > $ROOT/etc/version
 fi
 
