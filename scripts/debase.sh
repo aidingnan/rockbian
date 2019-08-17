@@ -24,13 +24,13 @@ $ECHO "building $DEBASE_TAR ..."
 DIR=$TMP/debase
 
 # isc-dhcp-client,isc-dhcp-server,ifupdown,
-INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,haveged,zstd,uuid,libarchive-zip-perl,
+INCS+=locales,tzdata,initramfs-tools,u-boot-tools,ca-certificates,haveged,zstd,uuid,
 INCS+=btrfs-progs,i2c-tools,zram-tools,xz-utils,parted,openssl,rfkill,
 INCS+=nano,curl,wget,file,unzip,iputils-ping,ethtool,bluez-hcidump,usbutils,xxd,
 INCS+=net-tools,wireless-tools,network-manager,
 INCS+=bluez,bluez-tools,bluetooth,
 INCS+=openssh-server,
-INCS+=libimage-exiftool-perl,imagemagick,ffmpeg,
+INCS+=libimage-exiftool-perl,imagemagick,ffmpeg,libarchive-zip-perl,ghostscript,
 INCS+=iperf3,stress-ng
 
 LOG=$TMP/debase.log
