@@ -43,8 +43,8 @@ mkdir -p $MNT/vols
 mkdir -p $MNT/refs/tags
 
 # set domain
-mkdir -p $MNT/data
-echo "aws-cn" > $MNT/data/domain
+# mkdir -p $MNT/data
+# echo "aws-cn" > $MNT/data/domain
 
 # set engineering mode
 mkdir -p $MNT/data/root.0
