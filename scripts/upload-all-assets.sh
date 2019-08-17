@@ -14,7 +14,7 @@ source $SCRIPT_DIR/main.env
 source $WINAS_ENV  
 source $WINASD_ENV
 
-list="$DEBASE_TAR $DEBASE_BUILD_TAR $KERNEL_DEB $ROOTFS_TAR $WINAS_TAR $WINASD_TAR $VOL_TAR"
+list="$DEBASE_TAR $DEBASE_BUILD_TAR $KERNEL_DEB $ROOTFS_TAR $WINAS_TAR $WINAS_DEV_TAR $WINASD_TAR $WINASD_DEV_TAR $VOL_TAR"
 for file in $list; do
   $SCRIPT_DIR/upload-asset.sh token=$token tag=$tag filename=$CACHE/$file
 done 
