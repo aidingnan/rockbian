@@ -54,7 +54,7 @@ else
   BUILD_WINASD=true
 fi
 
-if [ $BULD_WINAS ] || [ $BUILD_WINASD ]; then
+if [ $BUILD_WINAS ] || [ $BUILD_WINASD ]; then
   ROOT=$TMP/build-apps-root
   rm -rf $ROOT
   mkdir -p $ROOT
