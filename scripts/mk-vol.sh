@@ -8,6 +8,22 @@ if [ "$(git diff-index HEAD --)" ]; then
   exit 1
 fi
 
+{
+  TAG="$(git describe --exact-match --tag $COMMIT)"
+} || {
+  TAG=
+  echo "WARNING: no tag"
+}
+
+if [ "$TAG" ]; then
+  if [[ "$TAG" =~ /^v[1-9][0-9]*\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(|-(alpha|beta|rc\.[1-9][0-9]*))$/ ]]; then
+    :
+  else
+    echo "ERROR: bad tag $TAG"
+    exit 1
+  fi
+fi
+
 SCRIPT_DIR=$(dirname "$0")
 SCRIPT_NAME=$(basename "$0")
 ECHO="echo $SCRIPT_NAME:"
@@ -85,16 +101,12 @@ echo "$initial_subvol" > $MNT/refs/tags/initial
 echo "$working_subvol" > $MNT/refs/tags/working
 echo "$staging_subvol" > $MNT/refs/tags/staging
 
-$ECHO "saving commit and tag if any"
 COMMIT="$(git rev-parse HEAD)"
+$ECHO "saving commit $COMMIT to /boot/.commit"
 echo "$COMMIT" > $MNT/boot/.commit
 
-{
-  TAG="$(git describe --exact-match --tag $COMMIT)"
-} || {
-  TAG=
-}
 if [ "$TAG" ]; then
+  $ECHO "saving tag $TAG to /boot/.tag"
   echo "$TAG" > $MNT/boot/.tag
 fi
 
