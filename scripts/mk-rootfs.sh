@@ -8,6 +8,22 @@ if [ "$(git diff-index HEAD --)" ]; then
   exit 1
 fi
 
+{
+  TAG="$(git describe --exact-match --tag $COMMIT)"
+} || {
+  TAG=
+  echo "WARNING: no tag"
+}
+
+if [ "$TAG" ]; then
+  if [[ "$TAG" =~ /^v[1-9][0-9]*\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(|-(alpha|beta|rc\.[1-9][0-9]*))$/ ]]; then
+    :
+  else
+    echo "ERROR: bad tag $TAG"
+    exit 1
+  fi
+fi
+
 SCRIPT_DIR=$(dirname "$0")
 SCRIPT_NAME=$(basename "$0")
 ECHO="echo $SCRIPT_NAME:"
@@ -31,7 +47,7 @@ fi
 ROOT=$TMP/rootfs
 
 rm -rf $ROOT
-mkdir -p $ROOT 
+mkdir -p $ROOT
 
 tar xf $CACHE/$DEBASE_TAR --zstd -C $ROOT
 
@@ -304,11 +320,6 @@ COMMIT="$(git rev-parse HEAD)"
 $ECHO "saving commit $COMMIT to /boot/.commit"
 echo "$COMMIT" > $ROOT/boot/.commit
 
-{
-  TAG="$(git describe --exact-match --tag $COMMIT)"
-} || {
-  TAG=
-}
 if [ "$TAG" ]; then
   $ECHO "saving tag $TAG to both /boot/.tag and /etc/version"
   echo "$TAG" > $ROOT/boot/.tag
