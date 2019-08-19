@@ -39,10 +39,8 @@ source $SCRIPT_DIR/main.env
 source $CACHE/winas.env
 source $CACHE/winasd.env
 
-if [ -f $CACHE/$ROOTFS_TAR ]; then
-  $ECHO "$CACHE/$ROOTFS_TAR exists, skip rebuilding"
-  exit 0
-fi
+# remove old
+rm -rf $CACHE/$ROOTFS_TAR
 
 ROOT=$TMP/rootfs
 
