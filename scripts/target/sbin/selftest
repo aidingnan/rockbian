@@ -248,7 +248,7 @@ if (process.argv.indexOf('--led') !== -1) {
       let serial = await readSerialAsync()
       console.log('serial:', serial)
     } catch (e) {
-      console.log('ecc error', err.message)
+      console.log('ecc error', e.message)
       await ledWriteAsync(ledEncode('on', ['red']))
       process.exit(1)
     }
@@ -257,7 +257,7 @@ if (process.argv.indexOf('--led') !== -1) {
       let out = await readSdaAsync()  
       console.log(`sata test passed, ${out}`)
     } catch (e) {
-      console.log('sata test failed', err.message)
+      console.log('read sda error', e.message)
       await ledWriteAsync(ledEncode('blink', ['red']))
       process.exit(2)
     }
@@ -272,7 +272,7 @@ if (process.argv.indexOf('--led') !== -1) {
         process.exit(3)
       }
     } catch (e) {
-      console.log('blue scan failed', e.message)
+      console.log('blue scan error', e.message)
       await ledWriteAsync(ledEncode('breathing', ['red']))
       process.exit(4)
     }
@@ -294,7 +294,7 @@ if (process.argv.indexOf('--led') !== -1) {
         process.exit(5)
       }
     } catch (e) {
-      console.log('wifi scan failed', e.message)
+      console.log('wifi scan error', e.message)
       await ledWriteAsync(ledEncode('pulse', ['red']))
       process.exit(6)
     }
