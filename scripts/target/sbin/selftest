@@ -9,9 +9,9 @@ const ledInit = [
   [0x00, 0x55],   // RSTDIR
   [0x07, 0x00],   // Disable all leds
   [0x08, 0x08],   // SYNC/PWMLOG, TRUE COLOR
-  [0x10, 0x60],   // ILED1_1
-  [0x11, 0x60],   // ILED2_1
-  [0x12, 0xA0],   // ILED3_1
+  [0x10, 0xFF],   // ILED1_1
+  [0x11, 0xFF],   // ILED2_1
+  [0x12, 0xFF],   // ILED3_1
   [0x13, 0xFF],   // ILED1_2
   [0x14, 0x00],   // ILED2_2
   [0x15, 0x00],   // ILED3_2
@@ -21,22 +21,24 @@ const ledInit = [
   [0x19, 0x00],   // ILED1_4
   [0x1A, 0x00],   // ILED2_4
   [0x1B, 0xFF],   // ILED3_4
-  [0x1C, 0x60],   // PWM1
-  [0x1D, 0x40],   // PWM2
-  [0x1E, 0xA0],   // PWM3
+  [0x1C, 0x80],   // PWM1 green
+  [0x1D, 0xA0],   // PWM2 blue
+  [0x1E, 0xA0],   // PWM3 red
 ]
 
-const ledEncode = (mode, colors) => {
+const ledEncode = (mode, colors, shots) => {
   let arr = []
-  arr.push([0x07, 0x00])
+  arr.push([0x07, 0x00])        // disable all led channels
+  // arr.push([0x09, 0x70])        // stop all pattern
   if (mode === 'on') {
-    arr.push([0x04, 0x00])
+    arr.push([0x08, 0x00])
+    arr.push([0x04, 0x00])      // manual
     arr.push([0x05, 0x00])
     arr.push([0x06, 0x00])
 
     let color = colors[0]
     if (color === 'green') {
-      arr.push([0x07, 0x01])
+      arr.push([0x07, 0x01])    // enable single channel
     } else if (color === 'blue') {
       arr.push([0x07, 0x02])
     } else if (color === 'red') {
@@ -45,21 +47,25 @@ const ledEncode = (mode, colors) => {
       arr.push([0x07, 0x07])
     } 
   } else {
-    arr.push([0x04, 0x01])
+    arr.push([0x08, 0x08])
+    arr.push([0x04, 0x01])      // pattern
     arr.push([0x05, 0x01])
     arr.push([0x06, 0x01])
     switch (mode) {
       case 'blink':
-        arr.push([0x30, 0x22])
-        arr.push([0x31, 0x21])
-        break
-      case 'pulse':
-        arr.push([0x30, 0x10])
-        arr.push([0x31, 0x18])
+        arr.push([0x30, 0x22])  // rise, on
+        arr.push([0x31, 0x22])  // fall, off
+        arr.push([0x32, 0x00])  // slot, delay
         break
       case 'breathing':
-        arr.push([0x30, 0x80])
-        arr.push([0x31, 0x86])
+        arr.push([0x30, 0xA2])
+        arr.push([0x31, 0xA2])
+        arr.push([0x32, 0x00])
+        break
+      case 'pulse':
+        arr.push([0x30, 0x11])  
+        arr.push([0x31, 0x1A])
+        arr.push([0x32, 0x10])
         break
       default:
         break
@@ -84,31 +90,29 @@ const ledEncode = (mode, colors) => {
           break
       }
     })
+
+    if (mode === 'pulse') {
+      if (Number.isInteger(shots) && shots > 0 && shots < 5) {
+        b |= ((shots - 1) << 4)
+      } else {
+        b |= 0x10
+      }
+    }
     arr.push([0x33, b])
     arr.push([0x07, 0x07])
   }
   return arr
 }
 
-const i2csetAsync = async (addr, val) => 
-  new Promise((resolve, reject) => {
-    let a = addr.toString(16).padStart(2, '0')
-    let v = val.toString(16).padStart(2, '0')
-    child.exec(`i2cset -y 1 0x64 0x${a} 0x${v}`, err => 
-      err ? reject(err) : resolve(null))
-  })
-
 const ledWriteAsync = async arr => {
   for (let i = 0; i < arr.length; i++) {
     let [addr, val] = arr[i]
-    // await i2csetAsync(addr, val)
-  await new Promise((resolve, reject) => {
-    let a = addr.toString(16).padStart(2, '0')
-    let v = val.toString(16).padStart(2, '0')
-    child.exec(`i2cset -y 1 0x64 0x${a} 0x${v}`, err => 
-      err ? reject(err) : resolve(null))
-  })
-
+    await new Promise((resolve, reject) => {
+      let a = addr.toString(16).padStart(2, '0')
+      let v = val.toString(16).padStart(2, '0')
+      child.exec(`i2cset -y 1 0x64 0x${a} 0x${v}`, err => 
+        err ? reject(err) : resolve(null))
+    })
   }
 }
 
@@ -200,61 +204,103 @@ const wifiListAsync = async () =>
     })
   })
 
-;(async () => {
-  console.time('total')
-  await ledWriteAsync(ledInit)
-  await ledWriteAsync(ledEncode('blink', ['green']))
+if (process.argv.indexOf('--led') !== -1) {
+  (async () => {
+    let once = false
+    while (true) {
+      if (!once) {
+        once = true
+        await ledWriteAsync(ledInit)
+      }
 
-  try {
-    let serial = await readSerialAsync()
-    console.log('serial:', serial)
-  } catch (e) {
-    console.log('ecc error', err.message)
-    await ledWriteAsync(ledEncode('on', ['red']))
-    process.exit(1)
-  }
+      console.log('green blink 10s')
+      await ledWriteAsync(ledEncode('blink', ['green']))
+      await delayAsync(10)
 
-  try {
-    let out = await readSdaAsync()  
-    console.log(`sata test passed, ${out}`)
-  } catch (e) {
-    console.log('sata test failed', err.message)
-    await ledWriteAsync(ledEncode('breathing', ['red']))
-    process.exit(2)
-  }
+      console.log('red on 5s')
+      await ledWriteAsync(ledEncode('on', ['red']))
+      await delayAsync(5)
 
-  try {
-    let dev = await blueScanAsync(10)
-    if (dev) {
-      console.log(`blue scan found device ${dev}`)
-    } else {
-      console.log('blue scan found no device')
+      console.log('red blink 10s') 
       await ledWriteAsync(ledEncode('blink', ['red']))
-      process.exit(3)
-    }
-  } catch (e) {
-    console.log('blue scan failed', e.message)
-    await ledWriteAsync(ledEncode('blink', ['red']))
-    process.exit(4)
-  }
+      await delayAsync(10) 
 
-  try {
-    let list = await wifiListAsync()
-    if (list.length) {
-      console.log(`wifi scan found ${list.length} access points: ${list.join(', ')}`)
-    } else {
-      console.log('wifi scan found no access point')
+      console.log('red breathing 20s')
+      await ledWriteAsync(ledEncode('breathing', ['red']))
+      await delayAsync(20)
+
+      console.log('red pulse 20s')
       await ledWriteAsync(ledEncode('pulse', ['red'])) 
+      await delayAsync(20) 
+
+      console.log('white, green, blue, red, rotating 20s')
+      await ledWriteAsync(ledEncode('blink', ['green', 'blue', 'red', 'white']))
+      await delayAsync(20)  
     }
-  } catch (e) {
-    console.log('wifi scan failed', e.message)
-    await ledWriteAsync(ledEncode('pulse', ['red']))
-    process.exit(6)
-  }
+  })().then(() => {})
+} else {
+  (async () => {
+    console.time('total')
+    await ledWriteAsync(ledInit)
+    await ledWriteAsync(ledEncode('blink', ['green']))
 
-  await ledWriteAsync(ledEncode('blink', ['green', 'blue', 'red', 'white']))
-  console.timeEnd('total') 
-  process.exit(0) 
-})().then(() => {})
+    try {
+      let serial = await readSerialAsync()
+      console.log('serial:', serial)
+    } catch (e) {
+      console.log('ecc error', err.message)
+      await ledWriteAsync(ledEncode('on', ['red']))
+      process.exit(1)
+    }
 
+    try {
+      let out = await readSdaAsync()  
+      console.log(`sata test passed, ${out}`)
+    } catch (e) {
+      console.log('sata test failed', err.message)
+      await ledWriteAsync(ledEncode('blink', ['red']))
+      process.exit(2)
+    }
 
+    try {
+      let dev = await blueScanAsync(10)
+      if (dev) {
+        console.log(`blue scan found device ${dev}`)
+      } else {
+        console.log('blue scan found no device')
+        await ledWriteAsync(ledEncode('breathing', ['red']))
+        process.exit(3)
+      }
+    } catch (e) {
+      console.log('blue scan failed', e.message)
+      await ledWriteAsync(ledEncode('breathing', ['red']))
+      process.exit(4)
+    }
+
+    try {
+      let list
+      for (let i = 0; i < 5; i++) {
+        console.log(`scanning wifi (${i})`)
+        list = await wifiListAsync()
+        if (list.length) break
+        await delayAsync(1)
+      }
+
+      if (list.length) {
+        console.log(`wifi scan found ${list.length} access points: ${list.join(', ')}`)
+      } else {
+        console.log('wifi scan found no access point')
+        await ledWriteAsync(ledEncode('pulse', ['red'])) 
+        process.exit(5)
+      }
+    } catch (e) {
+      console.log('wifi scan failed', e.message)
+      await ledWriteAsync(ledEncode('pulse', ['red']))
+      process.exit(6)
+    }
+
+    await ledWriteAsync(ledEncode('blink', ['green', 'blue', 'red', 'white']))
+    console.timeEnd('total') 
+    process.exit(0) 
+  })().then(() => {})
+}
