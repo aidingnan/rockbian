@@ -260,6 +260,23 @@ WantedBy=bluetooth.target
 EOF
 chroot $ROOT systemctl enable preconfig-bluetooth.service
 
+cat >> $ROOT/lib/systemd/system/selftest.service << EOF
+[Unit]
+Description=Quick and Dirty Self-Test
+After=NetworkManager.service
+After=bluetooth.service
+ConditionPathExists=/run/cowroot/root/data/root/engineering
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/selftest
+
+[Install]
+WantedBy=multi-user.target
+EOF
+chroot $ROOT systemctl enable selftest.service
+
+
 # disable apt services
 chroot $ROOT systemctl mask apt-daily-upgrade.timer
 chroot $ROOT systemctl mask apt-daily.timer
