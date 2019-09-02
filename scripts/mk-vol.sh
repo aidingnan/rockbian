@@ -55,7 +55,9 @@ mount -o loop $IMG $MNT
 
 # create sub-dirs
 mkdir -p $MNT/boot
-mkdir -p $MNT/vols
+btrfs subvolume create $MNT/data
+btrfs subvolume create $MNT/vols
+btrfs subvolume create $MNT/refs
 mkdir -p $MNT/refs/tags
 
 # set domain
