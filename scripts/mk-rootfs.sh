@@ -181,8 +181,11 @@ chroot $ROOT systemctl enable preconfig-network-manager.service
 
 # config zram
 if [ -f $ROOT/etc/default/zramswap.conf ]; then
-  sed -i -e 's/#PERCENTAGE=10/PERCENTAGE=45/' $ROOT/etc/default/zramswap.conf
+  sed -i 's/#PERCENTAGE=10/PERCENTAGE=40/' $ROOT/etc/default/zramswap
 fi
+
+# config ntp servers
+sed -i 's/^#NTP=/NTP=ntp1.aliyun.com ntp2.aliyun.com ntp3.aliyun.com ntp4.aliyun.com ntp5.aliyun.com ntp6.aliyun.com ntp7.aliyun.com/' $ROOT/etc/systemd/timesyncd.conf 
 
 # fix haveged conf quirk
 cat > $ROOT/etc/default/haveged << EOF
