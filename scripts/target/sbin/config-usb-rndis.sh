@@ -12,7 +12,7 @@ mkdir -p strings/0x409
 # TODO use atecc number
 echo "badc0deddeadbeef" > strings/0x409/serialnumber
 echo "dingnan" > strings/0x409/manufacturer
-echo "net drive" > strings/0x409/product
+echo "IntelliDrive" > strings/0x409/product
 
 # RNDIS
 mkdir -p configs/c.1/strings/0x409
