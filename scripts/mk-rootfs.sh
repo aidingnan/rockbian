@@ -157,6 +157,9 @@ EOF
 # let nm manage usb net
 sed -i 's/^ENV{DEVTYPE}=="gadget"/# ENV{DEVTYPE}=="gadget"/' $ROOT/lib/udev/rules.d/85-nm-unmanaged.rules
 
+# set regdomain using old way
+sed -i 's/^REGDOMAIN=/REGDOMAIN=CN/' $ROOT/etc/default/crda
+
 # symlink connections dir
 rm -rf $ROOT/etc/NetworkManager/system-connections/
 mkdir -p $ROOT/etc/NetworkManager/
